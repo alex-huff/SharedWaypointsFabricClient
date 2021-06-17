@@ -1,7 +1,7 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "phonis.rtsurvival.mixin",
+  "package": "phonis.survival.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
   ],
