@@ -4,13 +4,15 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.network.MessageType;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.text.Text;
+import phonis.survival.State;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class RTSurvivalReceiver implements ClientPlayNetworking.PlayChannelHandler {
 
@@ -32,13 +34,21 @@ public class RTSurvivalReceiver implements ClientPlayNetworking.PlayChannelHandl
 
     private void handlePacket(MinecraftClient client, PacketSender responseSender, RTPacket packet) {
         if (packet instanceof RTWaypointInitialize waypointInitialize) {
-            StringBuilder messageBuilder = new StringBuilder();
+            State.waypointState = waypointInitialize.waypoints;
+        } else if (packet instanceof RTWaypointUpdate waypointUpdate) {
+            if (State.waypointState == null) return;
 
-            for (RTWaypoint waypoint : waypointInitialize.waypoints) {
-                messageBuilder.append(waypoint.name).append('\n');
-            }
+            List<RTWaypoint> newWaypointState = State.waypointState.stream().filter(waypoint -> !waypoint.name.equals(waypointUpdate.newWaypoint.name)).collect(Collectors.toList());
 
-            client.inGameHud.addChatMessage(MessageType.CHAT, Text.of(messageBuilder.toString()), client.player.getUuid());
+            newWaypointState.add(waypointUpdate.newWaypoint);
+
+            State.waypointState = newWaypointState;
+        } else if (packet instanceof RTWaypointRemove waypointRemove) {
+            if (State.waypointState == null) return;
+
+            List<RTWaypoint> newWaypointState = State.waypointState.stream().filter(waypoint -> !waypoint.name.equals(waypointRemove.toRemove)).collect(Collectors.toList());
+
+            State.waypointState = newWaypointState;
         } else {
             System.out.println("Unrecognised packet.");
         }
