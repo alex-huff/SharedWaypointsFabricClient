@@ -24,7 +24,7 @@ import phonis.survival.State;
 import phonis.survival.networking.RTDimension;
 import phonis.survival.networking.RTWaypoint;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
 // adapted from Masa's malilib
@@ -99,11 +99,15 @@ public abstract class MixinWorldRenderer
     }
 
     private static void renderWaypoints(DimensionType currentDimension) {
+        // MixinWorldRenderer.drawTextPlate(Arrays.asList("testing", "123"), 0, 0, 0);
+
+        // if (State.waypointState == null) return;
+
         for (RTWaypoint waypoint : State.waypointState) {
             if (MixinWorldRenderer.compareDimension(waypoint.dimension, currentDimension))
-                MixinWorldRenderer.drawTextPlate(Collections.singletonList(waypoint.name), waypoint.x, waypoint.y, waypoint.z);
+                MixinWorldRenderer.drawTextPlate(Arrays.asList(waypoint.name.split("\n")), waypoint.x, waypoint.y, waypoint.z);
             else if (waypoint.dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID))
-                MixinWorldRenderer.drawTextPlate(Collections.singletonList(waypoint.name), waypoint.x / 8.0, 128, waypoint.z / 8.0);
+                MixinWorldRenderer.drawTextPlate(Arrays.asList(waypoint.name.split("\n")), waypoint.x / 8.0, 128, waypoint.z / 8.0);
         }
     }
 
@@ -140,6 +144,7 @@ public abstract class MixinWorldRenderer
         double dy = y - cy;
         double dz = z - cz;
         double distance = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2) + Math.pow(dz, 2));
+        text.set(text.size() - 1, text.get(text.size() - 1) + " (" + (int) distance + "m)");
         float scale;
         double realX;
         double realY;
@@ -161,8 +166,8 @@ public abstract class MixinWorldRenderer
         }
 
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-
         MatrixStack globalStack = RenderSystem.getModelViewStack();
+
         globalStack.push();
         globalStack.translate(realX - cx, realY - cy, realZ - cz);
 
@@ -225,6 +230,7 @@ public abstract class MixinWorldRenderer
         RenderSystem.enableCull();
         RenderSystem.disableBlend();
         globalStack.pop();
+        RenderSystem.applyModelViewMatrix();
     }
 
 }
