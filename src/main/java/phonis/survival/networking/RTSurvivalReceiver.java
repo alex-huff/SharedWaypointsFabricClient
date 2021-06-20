@@ -65,6 +65,8 @@ public class RTSurvivalReceiver implements ClientPlayNetworking.PlayChannelHandl
             List<RTTether> newTetherState = State.tetherState.stream().filter(tether -> !tether.equals(tetherRemove.toRemove)).collect(Collectors.toList());
 
             State.tetherState = newTetherState;
+        } else if (packet instanceof RTChestFindSession chestFindSession) {
+            State.chestFindState = chestFindSession;
         } else {
             System.out.println("Unrecognised packet.");
         }

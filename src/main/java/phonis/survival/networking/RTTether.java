@@ -1,6 +1,8 @@
 package phonis.survival.networking;
 
-public abstract class RTTether implements RTPacket {
+import java.io.Serializable;
+
+public abstract class RTTether implements Serializable {
 
     public final RTDimension dimension;
     private final double x;

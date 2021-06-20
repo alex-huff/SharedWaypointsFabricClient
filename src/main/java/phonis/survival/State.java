@@ -1,5 +1,6 @@
 package phonis.survival;
 
+import phonis.survival.networking.RTChestFindSession;
 import phonis.survival.networking.RTTether;
 import phonis.survival.networking.RTWaypoint;
 
@@ -9,5 +10,6 @@ public class State {
 
     public static volatile List<RTWaypoint> waypointState = null;
     public static volatile List<RTTether> tetherState = null;
+    public static volatile RTChestFindSession chestFindState = null;
 
 }

@@ -43,6 +43,7 @@ public class RTSurvival implements ClientModInitializer {
 			(clientPlayNetworkHandler, minecraftClient) -> {
 				State.waypointState = null;
 				State.tetherState = null;
+				State.chestFindState = null;
 			}
 		);
 	}
