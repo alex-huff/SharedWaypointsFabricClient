@@ -6,9 +6,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.render.*;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Quaternion;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.*;
 import net.minecraft.world.dimension.DimensionType;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -19,9 +17,9 @@ import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Matrix4f;
 import phonis.survival.State;
 import phonis.survival.networking.RTDimension;
+import phonis.survival.networking.RTTether;
 import phonis.survival.networking.RTWaypoint;
 
 import java.util.Arrays;
@@ -32,6 +30,10 @@ import java.util.List;
 @Mixin(WorldRenderer.class)
 public abstract class MixinWorldRenderer
 {
+    private static final int red = MixinWorldRenderer.RGBAtoInt(255, 0, 0, 255);
+    private static final int blue = MixinWorldRenderer.RGBAtoInt(0, 0, 255, 255);
+    private static final int yellow = MixinWorldRenderer.RGBAtoInt(255, 255, 0, 255);
+
     @Shadow @Final private MinecraftClient client;
 
     @Inject(method = "render",
@@ -74,9 +76,6 @@ public abstract class MixinWorldRenderer
         if (mc.world == null) return;
 
         DimensionType currentDimension = mc.world.getDimension();
-
-        if (State.waypointState == null) return;
-
         Framebuffer fb = MinecraftClient.isFabulousGraphicsOrBetter() ? mc.worldRenderer.getTranslucentFramebuffer() : null;
 
         if (fb != null)
@@ -84,6 +83,7 @@ public abstract class MixinWorldRenderer
             fb.beginWrite(false);
         }
 
+        MixinWorldRenderer.renderTethers(currentDimension);
         MixinWorldRenderer.renderWaypoints(currentDimension);
 
         if (fb != null)
@@ -98,10 +98,99 @@ public abstract class MixinWorldRenderer
             || (dimension == RTDimension.END && currentDimension.getSkyProperties().equals(DimensionType.THE_END_ID));
     }
 
-    private static void renderWaypoints(DimensionType currentDimension) {
-        // MixinWorldRenderer.drawTextPlate(Arrays.asList("testing", "123"), 0, 0, 0);
+    private static int RGBAtoInt(int r, int g, int b, int a) {
+        int red = r & 0xFF;
+        int green = g & 0xFF;
+        int blue = b & 0xFF;
+        int alpha = a & 0xFF;
 
-        // if (State.waypointState == null) return;
+        return (alpha << 24) + (red << 16) + (green << 8) + (blue);
+    }
+
+    private static void renderTethers(DimensionType currentDimension) {
+        if (State.tetherState == null) return;
+
+        for (RTTether tether : State.tetherState) {
+            if (MixinWorldRenderer.compareDimension(tether.dimension, currentDimension))
+                MixinWorldRenderer.drawTether(tether.getX(), tether.getY(), tether.getZ(), MixinWorldRenderer.red);
+            else if (tether.dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID))
+                MixinWorldRenderer.drawTether(tether.getX() / 8.0, 128, tether.getZ() / 8.0, MixinWorldRenderer.red);
+        }
+    }
+
+    private static void drawTether(double x, double y, double z, int lineColor) {
+        Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
+        Vec3d cameraPos = camera.getPos();
+        double cx = cameraPos.x;
+        double cy = cameraPos.y;
+        double cz = cameraPos.z;
+        double rotX = camera.getYaw();
+        double rotY = camera.getPitch();
+        double xz = Math.cos(Math.toRadians(rotY));
+        double cxD = -xz * Math.sin(Math.toRadians(rotX));
+        double cyD = -Math.sin(Math.toRadians(rotY));
+        double czD = xz * Math.cos(Math.toRadians(rotX));
+        Vec3d cameraDirection = new Vec3d(cxD, cyD, czD);
+        Vec3d focalPoint = cameraDirection.normalize().multiply(2);
+        cx = cx + focalPoint.x;
+        cy = cy + focalPoint.y;
+        cz = cz + focalPoint.z;
+        double dx = x - cx;
+        double dy = y - cy;
+        double dz = z - cz;
+        double distance = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2) + Math.pow(dz, 2));
+        double realX;
+        double realY;
+        double realZ;
+        double maxDistance = 10;
+        int a = ((lineColor >>> 24) & 0xFF);
+        int r = ((lineColor >>> 16) & 0xFF);
+        int g = ((lineColor >>>  8) & 0xFF);
+        int b = (lineColor          & 0xFF);
+        Vec3d direction;
+
+        if (distance > maxDistance) {
+            direction = new Vec3d(dx, dy, dz).normalize().multiply(maxDistance);
+            realX = cx + direction.x;
+            realY = cy + direction.y;
+            realZ = cz + direction.z;
+        } else {
+            direction = new Vec3d(dx, dy, dz);
+            realX = x;
+            realY = y;
+            realZ = z;
+        }
+
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuffer();
+
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.depthMask(false);
+        RenderSystem.disableDepthTest();
+        RenderSystem.disableCull();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.disableTexture();
+
+        MatrixStack matrixStack = RenderSystem.getModelViewStack();
+
+        matrixStack.push();
+        matrixStack.translate(realX - cameraPos.x, realY - cameraPos.y, realZ - cameraPos.z);
+        RenderSystem.applyModelViewMatrix();
+        bufferBuilder.begin(VertexFormat.DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION_COLOR);
+        bufferBuilder.vertex(0, 0, 0).color(r, g, b, a).next();
+        bufferBuilder.vertex(-direction.x, -direction.y, -direction.z).color(r, g, b, a).next();
+        tessellator.draw();
+        matrixStack.pop();
+        RenderSystem.applyModelViewMatrix();
+        RenderSystem.depthMask(true);
+        RenderSystem.disableBlend();
+        RenderSystem.enableCull();
+        RenderSystem.enableTexture();
+    }
+
+    private static void renderWaypoints(DimensionType currentDimension) {
+        if (State.waypointState == null) return;
 
         for (RTWaypoint waypoint : State.waypointState) {
             if (MixinWorldRenderer.compareDimension(waypoint.dimension, currentDimension))

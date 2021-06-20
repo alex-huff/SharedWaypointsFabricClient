@@ -10,7 +10,7 @@ import phonis.survival.State;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,6 +49,22 @@ public class RTSurvivalReceiver implements ClientPlayNetworking.PlayChannelHandl
             List<RTWaypoint> newWaypointState = State.waypointState.stream().filter(waypoint -> !waypoint.name.equals(waypointRemove.toRemove)).collect(Collectors.toList());
 
             State.waypointState = newWaypointState;
+        } else if (packet instanceof RTTetherUpdate tetherUpdate) {
+            if (State.tetherState == null) {
+                State.tetherState = Collections.singletonList(tetherUpdate.toUpdate);
+            } else {
+                List<RTTether> newTetherState = State.tetherState.stream().filter(tether -> !tether.equals(tetherUpdate.toUpdate)).collect(Collectors.toList());
+
+                newTetherState.add(tetherUpdate.toUpdate);
+
+                State.tetherState = newTetherState;
+            }
+        } else if (packet instanceof RTTetherRemove tetherRemove) {
+            if (State.tetherState == null) return;
+
+            List<RTTether> newTetherState = State.tetherState.stream().filter(tether -> !tether.equals(tetherRemove.toRemove)).collect(Collectors.toList());
+
+            State.tetherState = newTetherState;
         } else {
             System.out.println("Unrecognised packet.");
         }

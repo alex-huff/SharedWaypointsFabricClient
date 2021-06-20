@@ -40,7 +40,10 @@ public class RTSurvival implements ClientModInitializer {
 			}
 		);
 		ClientPlayConnectionEvents.DISCONNECT.register(
-			(clientPlayNetworkHandler, minecraftClient) -> State.waypointState = null
+			(clientPlayNetworkHandler, minecraftClient) -> {
+				State.waypointState = null;
+				State.tetherState = null;
+			}
 		);
 	}
 
