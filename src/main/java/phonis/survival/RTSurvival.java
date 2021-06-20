@@ -3,6 +3,7 @@ package phonis.survival;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.networking.v1.C2SPlayChannelEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -33,22 +34,28 @@ public class RTSurvival implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		ClientPlayNetworking.registerGlobalReceiver(rtIdentifier, new RTSurvivalReceiver());
-		ClientPlayConnectionEvents.JOIN.register(
-			(clientPlayNetworkHandler, packetSender, minecraftClient) -> {
-				try {
-					ByteArrayOutputStream baos = new ByteArrayOutputStream();
-					ObjectOutputStream oos = new ObjectOutputStream(baos);
-					PacketByteBuf packetBuffer = PacketByteBufs.create();
+		C2SPlayChannelEvents.REGISTER.register(
+			(clientPlayNetworkHandler, packetSender, minecraftClient, ids) -> {
+				for (Identifier id : ids) {
+					if (id.equals(RTSurvival.rtIdentifier)) {
+						try {
+							ByteArrayOutputStream baos = new ByteArrayOutputStream();
+							ObjectOutputStream oos = new ObjectOutputStream(baos);
+							PacketByteBuf packetBuffer = PacketByteBufs.create();
 
-					oos.writeObject(new RTRegister());
-					oos.flush();
-					packetBuffer.writeBytes(baos.toByteArray());
-					packetSender.sendPacket(
-						rtIdentifier,
-						packetBuffer
-					);
-				} catch (IOException e) {
-					e.printStackTrace();
+							oos.writeObject(new RTRegister());
+							oos.flush();
+							packetBuffer.writeBytes(baos.toByteArray());
+							packetSender.sendPacket(
+								rtIdentifier,
+								packetBuffer
+							);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+
+						break;
+					}
 				}
 			}
 		);
