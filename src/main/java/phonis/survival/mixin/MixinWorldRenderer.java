@@ -13,6 +13,7 @@ import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.MatrixStack;
+import phonis.survival.State;
 import phonis.survival.render.RenderUtils;
 
 // adapted from Masa's malilib
@@ -70,7 +71,10 @@ public abstract class MixinWorldRenderer
         }
 
         RenderUtils.renderTethers(currentDimension);
-        RenderUtils.renderWaypoints(currentDimension);
+
+        if (State.renderWaypoints)
+            RenderUtils.renderWaypoints(currentDimension);
+
         RenderUtils.renderChestFindSession(currentDimension);
 
         if (fb != null)
