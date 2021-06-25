@@ -2,14 +2,14 @@ package phonis.survival.networking;
 
 import java.io.Serializable;
 
-public class RTChestFindLocation implements Serializable {
+public class RTLocation implements Serializable {
 
     public final RTDimension dimension;
     public final double x;
     public final double y;
     public final double z;
 
-    public RTChestFindLocation(RTDimension dimension, double x, double y, double z) {
+    public RTLocation(RTDimension dimension, double x, double y, double z) {
         this.dimension = dimension;
         this.x = x;
         this.y = y;
@@ -18,8 +18,8 @@ public class RTChestFindLocation implements Serializable {
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof RTChestFindLocation) {
-            RTChestFindLocation otherLocation = (RTChestFindLocation) other;
+        if (other instanceof RTLocation) {
+            RTLocation otherLocation = (RTLocation) other;
 
             return this.dimension.equals(otherLocation.dimension) &&
                 this.x == otherLocation.x &&

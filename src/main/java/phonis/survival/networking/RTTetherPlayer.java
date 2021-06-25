@@ -6,8 +6,8 @@ public class RTTetherPlayer extends RTTether {
 
     public final UUID uuid;
 
-    public RTTetherPlayer(UUID uuid, RTDimension dimension, double x, double y, double z) {
-        super(dimension, x, y, z);
+    public RTTetherPlayer(UUID uuid, RTLocation location) {
+        super(location);
 
         this.uuid = uuid;
     }

@@ -4,8 +4,8 @@ public class RTTetherWaypoint extends RTTether {
 
     public final String waypoint;
 
-    public RTTetherWaypoint(String waypoint, RTDimension dimension, double x, double y, double z) {
-        super(dimension, x, y, z);
+    public RTTetherWaypoint(String waypoint, RTLocation location) {
+        super(location);
 
         this.waypoint = waypoint;
     }

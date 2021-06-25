@@ -15,7 +15,7 @@ import net.minecraft.world.dimension.DimensionType;
 import phonis.survival.State;
 import phonis.survival.networking.*;
 
-import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 // adapted from Masa's malilib
@@ -26,7 +26,9 @@ public class RenderUtils {
     private static final RGBAColor blue = new RGBAColor(0, 0, 255, 255);
     private static final RGBAColor yellow = new RGBAColor(255, 255, 0, 255);
     private static final RGBAColor white = new RGBAColor(255, 255, 255, 255);
-    private static final RGBAColor plateBackground = new RGBAColor(0x40000000);
+    private static final RGBAColor distanceBackground = new RGBAColor(0x40000000);
+    private static final RGBAColor plateBackground = new RGBAColor(50, 50, 120, 160);
+    private static final RGBAColor fullBackground = new RGBAColor(120, 50, 50, 200);
 
     private static boolean compareDimension(RTDimension dimension, DimensionType currentDimension) {
         return (dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.OVERWORLD_ID))
@@ -61,7 +63,7 @@ public class RenderUtils {
         }
     }
 
-    private static void renderChestFindLocation(DimensionType currentDimension, RTChestFindLocation chestFindLocation, RGBAColor... colors) {
+    private static void renderChestFindLocation(DimensionType currentDimension, RTLocation chestFindLocation, RGBAColor... colors) {
         if (RenderUtils.compareDimension(chestFindLocation.dimension, currentDimension))
             RenderUtils.drawTether(chestFindLocation.x, chestFindLocation.y, chestFindLocation.z, colors);
         else if (chestFindLocation.dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID))
@@ -74,10 +76,10 @@ public class RenderUtils {
         if (tetherState == null) return;
 
         for (RTTether tether : tetherState) {
-            if (RenderUtils.compareDimension(tether.dimension, currentDimension))
-                RenderUtils.drawTether(tether.getX(), tether.getY(), tether.getZ(), Double.MAX_VALUE, RenderUtils.white, RenderUtils.red);
-            else if (tether.dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID))
-                RenderUtils.drawTether(tether.getX() / 8d, 128d, tether.getZ() / 8d, Double.MAX_VALUE, RenderUtils.white, RenderUtils.red);
+            if (RenderUtils.compareDimension(tether.location.dimension, currentDimension))
+                RenderUtils.drawTether(tether.location.x, tether.location.y, tether.location.z, Double.MAX_VALUE, RenderUtils.white, RenderUtils.red);
+            else if (tether.location.dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID))
+                RenderUtils.drawTether(tether.location.x / 8d, 128d, tether.location.z / 8d, Double.MAX_VALUE, RenderUtils.white, RenderUtils.red);
         }
     }
 
@@ -171,12 +173,47 @@ public class RenderUtils {
 
         if (waypointState == null) return;
 
-        for (RTWaypoint waypoint : waypointState) {
-            if (RenderUtils.compareDimension(waypoint.dimension, currentDimension))
-                RenderUtils.drawTextPlate(Arrays.asList(waypoint.name.split("\n")), waypoint.x, waypoint.y, waypoint.z);
-            else if (waypoint.dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID))
-                RenderUtils.drawTextPlate(Arrays.asList(waypoint.name.split("\n")), waypoint.x / 8.0, 128, waypoint.z / 8.0);
-        }
+        Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
+        Vec3d cameraPos = camera.getPos();
+        double cx = cameraPos.x;
+        double cy = cameraPos.y;
+        double cz = cameraPos.z;
+
+        RTWaypoint closest = waypointState.stream().filter(
+            waypoint -> (RenderUtils.compareDimension(waypoint.location.dimension, currentDimension)) ||
+                (waypoint.location.dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID))
+        ).min(
+            Comparator.comparingDouble(
+                waypoint -> {
+                    boolean adjusted = waypoint.location.dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID);
+                    double dx = adjusted ? waypoint.location.x / 8d - cx : waypoint.location.x - cx;
+                    double dy = adjusted ? 128d - cy : waypoint.location.y - cy;
+                    double dz = adjusted ? waypoint.location.z / 8d - cz : waypoint.location.z - cz;
+                    Vec3d waypointDirection = new Vec3d(dx, dy, dz).normalize();
+                    double rotX = camera.getYaw();
+                    double rotY = camera.getPitch();
+                    double xz = Math.cos(Math.toRadians(rotY));
+                    double cxD = -xz * Math.sin(Math.toRadians(rotX));
+                    double cyD = -Math.sin(Math.toRadians(rotY));
+                    double czD = xz * Math.cos(Math.toRadians(rotX));
+                    Vec3d cameraDirection = new Vec3d(cxD, cyD, czD).normalize();
+
+                    return cameraDirection.distanceTo(waypointDirection);
+                }
+            )
+        ).orElse(null);
+
+        if (closest == null) return;
+
+        waypointState.stream().filter(waypoint -> !closest.name.equals(waypoint.name)).forEach(waypoint -> RenderUtils.drawWaypoint(currentDimension, waypoint, false));
+        RenderUtils.drawWaypoint(currentDimension, closest, true);
+    }
+
+    private static void drawWaypoint(DimensionType currentDimension, RTWaypoint closest, boolean full) {
+        if (RenderUtils.compareDimension(closest.location.dimension, currentDimension))
+            RenderUtils.drawTextPlate(closest.name, closest.location.x, closest.location.y, closest.location.z, full);
+        else if (closest.location.dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID))
+            RenderUtils.drawTextPlate(closest.name, closest.location.x / 8d, 128d, closest.location.z / 8d, full);
     }
 
     private static void setupBlend()
@@ -190,18 +227,18 @@ public class RenderUtils {
         RenderSystem.setShaderColor(r, g, b, a);
     }
 
-    private static void drawTextPlate(List<String> text, double x, double y, double z)
+    private static void drawTextPlate(String text, double x, double y, double z, boolean full)
     {
         Entity entity = MinecraftClient.getInstance().getCameraEntity();
 
         if (entity != null)
         {
-            RenderUtils.drawTextPlate(text, x, y, z, entity.getYaw(), entity.getPitch(), RenderUtils.white, RenderUtils.plateBackground);
+            RenderUtils.drawTextPlate(text, x, y, z, entity.getYaw(), entity.getPitch(), RenderUtils.white, full);
         }
     }
 
-    private static void drawTextPlate(List<String> text, double x, double y, double z, float yaw, float pitch,
-                                      RGBAColor textColor, RGBAColor bgColor)
+    private static void drawTextPlate(String text, double x, double y, double z, float yaw, float pitch,
+                                      RGBAColor textColor, boolean full)
     {
         Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
         Vec3d cameraPos = camera.getPos();
@@ -212,13 +249,12 @@ public class RenderUtils {
         double dy = y - cy;
         double dz = z - cz;
         double distance = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2) + Math.pow(dz, 2));
-        text.set(text.size() - 1, text.get(text.size() - 1) + " (" + (int) distance + "m)");
         float scale;
         double realX;
         double realY;
         double realZ;
         double maxDistance = 10;
-        float targetScale = .04f;
+        float targetScale = .06f;
 
         if (distance > maxDistance) {
             Vec3d direction = new Vec3d(dx, dy, dz).normalize().multiply(maxDistance);
@@ -253,39 +289,52 @@ public class RenderUtils {
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        int maxLineLen = 0;
 
-        for (String line : text)
-        {
-            maxLineLen = Math.max(maxLineLen, textRenderer.getWidth(line));
-        }
+        if (text.length() == 0) return;
 
-        int strLenHalf = maxLineLen / 2;
-        int textHeight = textRenderer.fontHeight * text.size() - 1;
+        String adjustedText = (full || State.fullWaypointNames) ? text : text.substring(0, 1).toUpperCase();
+        String distanceStr = (int) distance + "m";
+        String[] fullText = full ? new String[] { adjustedText, (int) distance + "m" } : new String[] { adjustedText };
+        int lineLen = textRenderer.getWidth(adjustedText);
+        int strLenHalf = lineLen / 2;
+        int textHeight = textRenderer.fontHeight - 1;
+        RGBAColor background = full ? RenderUtils.fullBackground : RenderUtils.plateBackground;
 
         RenderSystem.depthMask(false);
         RenderSystem.disableDepthTest();
 
         buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-        buffer.vertex(-strLenHalf - 1,          -1, 0.0D).color(bgColor.r, bgColor.g, bgColor.b, bgColor.a).next();
-        buffer.vertex(-strLenHalf - 1,  textHeight, 0.0D).color(bgColor.r, bgColor.g, bgColor.b, bgColor.a).next();
-        buffer.vertex( strLenHalf    ,  textHeight, 0.0D).color(bgColor.r, bgColor.g, bgColor.b, bgColor.a).next();
-        buffer.vertex( strLenHalf    ,          -1, 0.0D).color(bgColor.r, bgColor.g, bgColor.b, bgColor.a).next();
+        buffer.vertex(-strLenHalf - 1,          -1, 0.0D).color(background.r, background.g, background.b, background.a).next();
+        buffer.vertex(-strLenHalf - 1,  textHeight, 0.0D).color(background.r, background.g, background.b, background.a).next();
+        buffer.vertex( strLenHalf    ,  textHeight, 0.0D).color(background.r, background.g, background.b, background.a).next();
+        buffer.vertex( strLenHalf    ,          -1, 0.0D).color(background.r, background.g, background.b, background.a).next();
         tessellator.draw();
+
+        if (full) {
+            lineLen = textRenderer.getWidth(distanceStr);
+            strLenHalf = lineLen / 2;
+
+            buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
+            buffer.vertex(-strLenHalf - 1,          textRenderer.fontHeight - 1, 0.0D).color(RenderUtils.distanceBackground.r, RenderUtils.distanceBackground.g, RenderUtils.distanceBackground.b, RenderUtils.distanceBackground.a).next();
+            buffer.vertex(-strLenHalf - 1,  textHeight + textRenderer.fontHeight, 0.0D).color(RenderUtils.distanceBackground.r, RenderUtils.distanceBackground.g, RenderUtils.distanceBackground.b, RenderUtils.distanceBackground.a).next();
+            buffer.vertex( strLenHalf    ,  textHeight + textRenderer.fontHeight, 0.0D).color(RenderUtils.distanceBackground.r, RenderUtils.distanceBackground.g, RenderUtils.distanceBackground.b, RenderUtils.distanceBackground.a).next();
+            buffer.vertex( strLenHalf    ,          textRenderer.fontHeight - 1, 0.0D).color(RenderUtils.distanceBackground.r, RenderUtils.distanceBackground.g, RenderUtils.distanceBackground.b, RenderUtils.distanceBackground.a).next();
+            tessellator.draw();
+        }
 
         RenderSystem.enableTexture();
         int textY = 0;
         Matrix4f modelMatrix = new Matrix4f();
         modelMatrix.loadIdentity();
 
-        for (String line : text)
+        for (String line : fullText)
         {
             VertexConsumerProvider.Immediate immediate = VertexConsumerProvider.immediate(buffer);
-            textRenderer.draw(line, -strLenHalf, textY, 0x20000000 | (textColor.toInt() & 0xFFFFFF), false, modelMatrix, immediate, true, 0, 15728880);
+            textRenderer.draw(line, -(textRenderer.getWidth(line) / 2f), textY, 0x20000000 | (textColor.toInt() & 0xFFFFFF), false, modelMatrix, immediate, true, 0, 15728880);
             immediate.draw();
 
             immediate = VertexConsumerProvider.immediate(buffer);
-            textRenderer.draw(line, -strLenHalf, textY, textColor.toInt(), false, modelMatrix, immediate, true, 0, 15728880);
+            textRenderer.draw(line, -(textRenderer.getWidth(line) / 2f), textY, textColor.toInt(), false, modelMatrix, immediate, true, 0, 15728880);
             immediate.draw();
             textY += textRenderer.fontHeight;
         }
