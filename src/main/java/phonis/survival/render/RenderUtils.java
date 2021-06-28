@@ -257,7 +257,7 @@ public class RenderUtils {
         double realY;
         double realZ;
         double maxDistance = 10;
-        float targetScale = .05f;
+        float targetScale = State.scale;
 
         if (distance > maxDistance) {
             Vec3d direction = new Vec3d(dx, dy, dz).normalize().multiply(maxDistance);

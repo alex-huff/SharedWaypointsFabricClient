@@ -11,6 +11,7 @@ public class State {
     public static volatile boolean highlightClosest = true;
     public static volatile boolean renderWaypoints = true;
     public static volatile boolean fullWaypointNames = false;
+    public static volatile float scale = .05f;
     public static volatile RTWaypoint hoveredWaypoint = null;
     public static volatile List<RTWaypoint> waypointState = null;
     public static volatile List<RTTether> tetherState = null;

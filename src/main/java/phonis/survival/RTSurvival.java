@@ -95,6 +95,14 @@ public class RTSurvival implements ClientModInitializer {
 			"RTSurvival"
 		)
 	);
+	private static final KeyBinding changeRenderScale = KeyBindingHelper.registerKeyBinding(
+		new KeyBinding(
+			"Render Scale Modifier",
+			InputUtil.Type.KEYSYM,
+			GLFW.GLFW_KEY_G,
+			"RTSurvival"
+		)
+	);
 
 	@Override
 	public void onInitializeClient() {
@@ -148,11 +156,19 @@ public class RTSurvival implements ClientModInitializer {
 				}
 
 				while (ficClearBinding.wasPressed()) {
-					this.sendPacket(new RTFICClear());
+					if (changeRenderScale.isPressed()) {
+						if (State.scale > .02f) State.scale -= .005f; // ok to be non-atomic since this is the only thread writing to this variable
+					} else {
+						this.sendPacket(new RTFICClear());
+					}
 				}
 
 				while (tetherClearBinding.wasPressed()) {
-					this.sendPacket(new RTTetherClear());
+					if (changeRenderScale.isPressed()) {
+						if (State.scale < .1f) State.scale += .005f; // ok to be non-atomic since this is the only thread writing to this variable
+					} else {
+						this.sendPacket(new RTTetherClear());
+					}
 				}
 
 				while (ficCurrentHeldItem.wasPressed()) {
