@@ -26,7 +26,8 @@ public class RenderUtils {
     private static final RGBAColor blue = new RGBAColor(0, 0, 255, 255);
     private static final RGBAColor yellow = new RGBAColor(255, 255, 0, 255);
     private static final RGBAColor white = new RGBAColor(255, 255, 255, 255);
-    private static final RGBAColor distanceBackground = new RGBAColor(0x40000000);
+    // private static final RGBAColor distanceBackground = new RGBAColor(0x40000000);
+    private static final RGBAColor distanceBackground = new RGBAColor(50, 50, 50, 255);
     private static final RGBAColor plateBackground = new RGBAColor(50, 50, 120, 160);
     private static final RGBAColor fullBackground = new RGBAColor(120, 50, 50, 200);
 
@@ -205,8 +206,10 @@ public class RenderUtils {
 
         if (closest == null) return;
 
+        State.hoveredWaypoint = closest;
+
         waypointState.stream().filter(waypoint -> !closest.name.equals(waypoint.name)).forEach(waypoint -> RenderUtils.drawWaypoint(currentDimension, waypoint, false));
-        RenderUtils.drawWaypoint(currentDimension, closest, true);
+        RenderUtils.drawWaypoint(currentDimension, closest, State.highlightClosest);
     }
 
     private static void drawWaypoint(DimensionType currentDimension, RTWaypoint closest, boolean full) {
@@ -254,7 +257,7 @@ public class RenderUtils {
         double realY;
         double realZ;
         double maxDistance = 10;
-        float targetScale = .06f;
+        float targetScale = .05f;
 
         if (distance > maxDistance) {
             Vec3d direction = new Vec3d(dx, dy, dz).normalize().multiply(maxDistance);

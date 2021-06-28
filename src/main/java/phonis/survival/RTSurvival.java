@@ -47,6 +47,54 @@ public class RTSurvival implements ClientModInitializer {
 			"RTSurvival"
 		)
 	);
+	private static final KeyBinding ficClearBinding = KeyBindingHelper.registerKeyBinding(
+		new KeyBinding(
+			"FIC Clear",
+			InputUtil.Type.KEYSYM,
+			GLFW.GLFW_KEY_LEFT,
+			"RTSurvival"
+		)
+	);
+	private static final KeyBinding tetherClearBinding = KeyBindingHelper.registerKeyBinding(
+		new KeyBinding(
+			"Tether Clear",
+			InputUtil.Type.KEYSYM,
+			GLFW.GLFW_KEY_RIGHT,
+			"RTSurvival"
+		)
+	);
+	private static final KeyBinding toggleHighlightClosestBinding = KeyBindingHelper.registerKeyBinding(
+		new KeyBinding(
+			"Toggle Closest Waypoint Highlight",
+			InputUtil.Type.KEYSYM,
+			GLFW.GLFW_KEY_H,
+			"RTSurvival"
+		)
+	);
+	private static final KeyBinding ficCurrentHeldItem = KeyBindingHelper.registerKeyBinding(
+		new KeyBinding(
+			"FIC on the Current Held Item",
+			InputUtil.Type.KEYSYM,
+			GLFW.GLFW_KEY_DOWN,
+			"RTSurvival"
+		)
+	);
+	private static final KeyBinding tetherOnHoveredWaypoint = KeyBindingHelper.registerKeyBinding(
+		new KeyBinding(
+			"Tether on Hovered Waypoint",
+			InputUtil.Type.KEYSYM,
+			GLFW.GLFW_KEY_J,
+			"RTSurvival"
+		)
+	);
+	private static final KeyBinding sTPToHoveredWaypoint = KeyBindingHelper.registerKeyBinding(
+		new KeyBinding(
+			"Spec TP to Hovered Waypoint",
+			InputUtil.Type.KEYSYM,
+			GLFW.GLFW_KEY_K,
+			"RTSurvival"
+		)
+	);
 
 	@Override
 	public void onInitializeClient() {
@@ -79,13 +127,56 @@ public class RTSurvival implements ClientModInitializer {
 		ClientTickEvents.END_CLIENT_TICK.register(
 			client -> {
 				while (toggleWaypointsKeyBinding.wasPressed()) {
-					State.renderWaypoints = !State.renderWaypoints; // ok to be non-atomic since this is the only thread writing to this variable
+					boolean current = State.renderWaypoints;
+					State.renderWaypoints = !current; // ok to be non-atomic since this is the only thread writing to this variable
+
+					if (current) {
+						State.hoveredWaypoint = null;
+					}
 				}
+
 				while (toggleWaypointFullNamesKeyBinding.wasPressed()) {
 					State.fullWaypointNames = !State.fullWaypointNames; // ok to be non-atomic since this is the only thread writing to this variable
 				}
+
+				while (toggleHighlightClosestBinding.wasPressed()) {
+					State.highlightClosest = !State.highlightClosest; // ok to be non-atomic since this is the only thread writing to this variable
+				}
+
 				while (stogKeyBinding.wasPressed()) {
 					this.sendPacket(new RTSTog());
+				}
+
+				while (ficClearBinding.wasPressed()) {
+					this.sendPacket(new RTFICClear());
+				}
+
+				while (tetherClearBinding.wasPressed()) {
+					this.sendPacket(new RTTetherClear());
+				}
+
+				while (ficCurrentHeldItem.wasPressed()) {
+					this.sendPacket(new RTFIC());
+				}
+
+				while (tetherOnHoveredWaypoint.wasPressed()) {
+					RTWaypoint hoveredWaypoint = State.hoveredWaypoint;
+
+					if (hoveredWaypoint == null) {
+						continue;
+					}
+
+					this.sendPacket(new RTTetherOnHoveredWaypoint(hoveredWaypoint.name));
+				}
+
+				while (sTPToHoveredWaypoint.wasPressed()) {
+					RTWaypoint hoveredWaypoint = State.hoveredWaypoint;
+
+					if (hoveredWaypoint == null) {
+						continue;
+					}
+
+					this.sendPacket(new RTSTPToHoveredWaypoint(hoveredWaypoint.name));
 				}
 			}
 		);
