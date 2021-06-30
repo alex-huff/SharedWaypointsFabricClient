@@ -33,7 +33,9 @@ public class RTSurvivalReceiver implements ClientPlayNetworking.PlayChannelHandl
     }
 
     private void handlePacket(MinecraftClient client, PacketSender responseSender, RTPacket packet) {
-        if (packet instanceof RTWaypointInitialize waypointInitialize) {
+        if (packet instanceof RTUnsupported rtUnsupported) {
+            System.out.println("Unsupported: " + rtUnsupported.protocolVersion);
+        } else if (packet instanceof RTWaypointInitialize waypointInitialize) {
             State.waypointState = waypointInitialize.waypoints;
         } else if (packet instanceof RTWaypointUpdate waypointUpdate) {
             if (State.waypointState == null) return;

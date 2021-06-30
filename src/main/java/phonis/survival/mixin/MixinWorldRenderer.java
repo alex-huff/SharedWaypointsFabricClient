@@ -72,7 +72,7 @@ public abstract class MixinWorldRenderer
 
         RenderUtils.renderTethers(currentDimension);
 
-        if (State.renderWaypoints)
+        if (State.config.renderWaypoints)
             RenderUtils.renderWaypoints(currentDimension);
 
         RenderUtils.renderChestFindSession(currentDimension);

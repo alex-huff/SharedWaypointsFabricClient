@@ -1,10 +1,10 @@
 package phonis.survival.networking;
 
-public class RTRegister implements RTPacket {
+public class RTUnsupported implements RTPacket {
 
     public final int protocolVersion;
 
-    public RTRegister(int protocolVersion) {
+    public RTUnsupported(int protocolVersion) {
         this.protocolVersion = protocolVersion;
     }
 

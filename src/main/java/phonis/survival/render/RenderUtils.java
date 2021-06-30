@@ -209,7 +209,7 @@ public class RenderUtils {
         State.hoveredWaypoint = closest;
 
         waypointState.stream().filter(waypoint -> !closest.name.equals(waypoint.name)).forEach(waypoint -> RenderUtils.drawWaypoint(currentDimension, waypoint, false));
-        RenderUtils.drawWaypoint(currentDimension, closest, State.highlightClosest);
+        RenderUtils.drawWaypoint(currentDimension, closest, State.config.highlightClosest);
     }
 
     private static void drawWaypoint(DimensionType currentDimension, RTWaypoint closest, boolean full) {
@@ -257,7 +257,7 @@ public class RenderUtils {
         double realY;
         double realZ;
         double maxDistance = 10;
-        float targetScale = State.scale;
+        float targetScale = State.config.scale;
 
         if (distance > maxDistance) {
             Vec3d direction = new Vec3d(dx, dy, dz).normalize().multiply(maxDistance);
@@ -295,7 +295,7 @@ public class RenderUtils {
 
         if (text.length() == 0) return;
 
-        String adjustedText = (full || State.fullWaypointNames) ? text : text.substring(0, 1).toUpperCase();
+        String adjustedText = (full || State.config.fullWaypointNames) ? text : text.substring(0, 1).toUpperCase();
         String distanceStr = (int) distance + "m";
         String[] fullText = full ? new String[] { adjustedText, (int) distance + "m" } : new String[] { adjustedText };
         int lineLen = textRenderer.getWidth(adjustedText);

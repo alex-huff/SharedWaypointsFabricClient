@@ -22,6 +22,8 @@ import java.io.ObjectOutputStream;
 
 public class RTSurvival implements ClientModInitializer {
 
+	public static final int protocolVersion = 1;
+	public static final String configDirectory = "config/RTSurvival/";
 	public static final Identifier rtIdentifier = new Identifier("rtsurvival:main");
 	private static final KeyBinding toggleWaypointsKeyBinding = KeyBindingHelper.registerKeyBinding(
 		new KeyBinding(
@@ -104,6 +106,14 @@ public class RTSurvival implements ClientModInitializer {
 		)
 	);
 
+	private void saveConfig() {
+		try {
+			State.config.saveToFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	@Override
 	public void onInitializeClient() {
 		ClientPlayNetworking.registerGlobalReceiver(rtIdentifier, new RTSurvivalReceiver());
@@ -114,7 +124,7 @@ public class RTSurvival implements ClientModInitializer {
 						try {
 							packetSender.sendPacket(
 								rtIdentifier,
-								this.packetToByteBuf(new RTRegister())
+								this.packetToByteBuf(new RTRegister(RTSurvival.protocolVersion))
 							);
 						} catch (IOException e) {
 							e.printStackTrace();
@@ -134,9 +144,12 @@ public class RTSurvival implements ClientModInitializer {
 		);
 		ClientTickEvents.END_CLIENT_TICK.register(
 			client -> {
+				boolean needToUpdateConfig = false;
+
 				while (toggleWaypointsKeyBinding.wasPressed()) {
-					boolean current = State.renderWaypoints;
-					State.renderWaypoints = !current; // ok to be non-atomic since this is the only thread writing to this variable
+					boolean current = State.config.renderWaypoints;
+					State.config.renderWaypoints = !current; // ok to be non-atomic since this is the only thread writing to this variable
+					needToUpdateConfig = true;
 
 					if (current) {
 						State.hoveredWaypoint = null;
@@ -144,11 +157,13 @@ public class RTSurvival implements ClientModInitializer {
 				}
 
 				while (toggleWaypointFullNamesKeyBinding.wasPressed()) {
-					State.fullWaypointNames = !State.fullWaypointNames; // ok to be non-atomic since this is the only thread writing to this variable
+					State.config.fullWaypointNames = !State.config.fullWaypointNames; // ok to be non-atomic since this is the only thread writing to this variable
+					needToUpdateConfig = true;
 				}
 
 				while (toggleHighlightClosestBinding.wasPressed()) {
-					State.highlightClosest = !State.highlightClosest; // ok to be non-atomic since this is the only thread writing to this variable
+					State.config.highlightClosest = !State.config.highlightClosest; // ok to be non-atomic since this is the only thread writing to this variable
+					needToUpdateConfig = true;
 				}
 
 				while (stogKeyBinding.wasPressed()) {
@@ -157,7 +172,8 @@ public class RTSurvival implements ClientModInitializer {
 
 				while (ficClearBinding.wasPressed()) {
 					if (changeRenderScale.isPressed()) {
-						if (State.scale > .02f) State.scale -= .005f; // ok to be non-atomic since this is the only thread writing to this variable
+						if (State.config.scale > .02f) State.config.scale -= .005f; // ok to be non-atomic since this is the only thread writing to this variable
+						needToUpdateConfig = true;
 					} else {
 						this.sendPacket(new RTFICClear());
 					}
@@ -165,7 +181,8 @@ public class RTSurvival implements ClientModInitializer {
 
 				while (tetherClearBinding.wasPressed()) {
 					if (changeRenderScale.isPressed()) {
-						if (State.scale < .1f) State.scale += .005f; // ok to be non-atomic since this is the only thread writing to this variable
+						if (State.config.scale < .1f) State.config.scale += .005f; // ok to be non-atomic since this is the only thread writing to this variable
+						needToUpdateConfig = true;
 					} else {
 						this.sendPacket(new RTTetherClear());
 					}
@@ -194,6 +211,8 @@ public class RTSurvival implements ClientModInitializer {
 
 					this.sendPacket(new RTSTPToHoveredWaypoint(hoveredWaypoint.name));
 				}
+
+				if (needToUpdateConfig) this.saveConfig();
 			}
 		);
 	}
