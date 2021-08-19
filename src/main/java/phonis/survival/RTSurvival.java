@@ -25,106 +25,101 @@ public class RTSurvival implements ClientModInitializer {
 	public static final int protocolVersion = 1;
 	public static final String configDirectory = "config/RTSurvival/";
 	public static final Identifier rtIdentifier = new Identifier("rtsurvival:main");
-	private static final KeyBinding toggleWaypointsKeyBinding = KeyBindingHelper.registerKeyBinding(
+	private static final String category = "category.rtsurvival.rtSurvival";
+	public static final KeyBinding openConfigScreen = KeyBindingHelper.registerKeyBinding(
 		new KeyBinding(
-			"Toggle Waypoints",
-			InputUtil.Type.KEYSYM,
-			GLFW.GLFW_KEY_N,
-			"RTSurvival"
-		)
-	);
-	private static final KeyBinding toggleWaypointFullNamesKeyBinding = KeyBindingHelper.registerKeyBinding(
-		new KeyBinding(
-			"Toggle Full Waypoint Names",
-			InputUtil.Type.KEYSYM,
-			GLFW.GLFW_KEY_V,
-			"RTSurvival"
-		)
-	);
-	private static final KeyBinding stogKeyBinding = KeyBindingHelper.registerKeyBinding(
-		new KeyBinding(
-			"Spectog",
-			InputUtil.Type.KEYSYM,
-			GLFW.GLFW_KEY_UP,
-			"RTSurvival"
-		)
-	);
-	private static final KeyBinding ficClearBinding = KeyBindingHelper.registerKeyBinding(
-		new KeyBinding(
-			"FIC Clear",
-			InputUtil.Type.KEYSYM,
-			GLFW.GLFW_KEY_LEFT,
-			"RTSurvival"
-		)
-	);
-	private static final KeyBinding tetherClearBinding = KeyBindingHelper.registerKeyBinding(
-		new KeyBinding(
-			"Tether Clear",
-			InputUtil.Type.KEYSYM,
-			GLFW.GLFW_KEY_RIGHT,
-			"RTSurvival"
-		)
-	);
-	private static final KeyBinding toggleHighlightClosestBinding = KeyBindingHelper.registerKeyBinding(
-		new KeyBinding(
-			"Toggle Closest Waypoint Highlight",
-			InputUtil.Type.KEYSYM,
-			GLFW.GLFW_KEY_H,
-			"RTSurvival"
-		)
-	);
-	private static final KeyBinding ficCurrentHeldItem = KeyBindingHelper.registerKeyBinding(
-		new KeyBinding(
-			"FIC on the Current Held Item",
-			InputUtil.Type.KEYSYM,
-			GLFW.GLFW_KEY_DOWN,
-			"RTSurvival"
-		)
-	);
-	private static final KeyBinding tetherOnHoveredWaypoint = KeyBindingHelper.registerKeyBinding(
-		new KeyBinding(
-			"Tether on Hovered Waypoint",
-			InputUtil.Type.KEYSYM,
-			GLFW.GLFW_KEY_J,
-			"RTSurvival"
-		)
-	);
-	private static final KeyBinding sTPToHoveredWaypoint = KeyBindingHelper.registerKeyBinding(
-		new KeyBinding(
-			"Spec TP to Hovered Waypoint",
-			InputUtil.Type.KEYSYM,
-			GLFW.GLFW_KEY_K,
-			"RTSurvival"
-		)
-	);
-	private static final KeyBinding changeRenderScale = KeyBindingHelper.registerKeyBinding(
-		new KeyBinding(
-			"Render Scale Modifier",
+			"binding.rtsurvival.rtMenu",
 			InputUtil.Type.KEYSYM,
 			GLFW.GLFW_KEY_G,
-			"RTSurvival"
+			RTSurvival.category
 		)
 	);
-
-	private void saveConfig() {
-		try {
-			State.config.saveToFile();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+	public static final KeyBinding toggleWaypointsKeyBinding = KeyBindingHelper.registerKeyBinding(
+        new KeyBinding(
+            "binding.rtsurvival.toggleWaypoints",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_N,
+			RTSurvival.category
+        )
+    );
+	public static final KeyBinding toggleWaypointFullNamesKeyBinding = KeyBindingHelper.registerKeyBinding(
+        new KeyBinding(
+            "binding.rtsurvival.toggleFullNames",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_UNKNOWN,
+			RTSurvival.category
+        )
+    );
+	public static final KeyBinding toggleHighlightClosestBinding = KeyBindingHelper.registerKeyBinding(
+		new KeyBinding(
+			"binding.rtsurvival.closestHighlight",
+			InputUtil.Type.KEYSYM,
+			GLFW.GLFW_KEY_UNKNOWN,
+			RTSurvival.category
+		)
+	);
+	public static final KeyBinding tetherOnHoveredWaypoint = KeyBindingHelper.registerKeyBinding(
+		new KeyBinding(
+			"binding.rtsurvival.tetherHoveredWaypoint",
+			InputUtil.Type.KEYSYM,
+			GLFW.GLFW_KEY_J,
+			RTSurvival.category
+		)
+	);
+	public static final KeyBinding sTPToHoveredWaypoint = KeyBindingHelper.registerKeyBinding(
+		new KeyBinding(
+			"binding.rtsurvival.stpHoveredWaypoint",
+			InputUtil.Type.KEYSYM,
+			GLFW.GLFW_KEY_K,
+			RTSurvival.category
+		)
+	);
+	public static final KeyBinding stogKeyBinding = KeyBindingHelper.registerKeyBinding(
+        new KeyBinding(
+            "binding.rtsurvival.spectog",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_UP,
+			RTSurvival.category
+        )
+    );
+	public static final KeyBinding ficClearBinding = KeyBindingHelper.registerKeyBinding(
+        new KeyBinding(
+            "binding.rtsurvival.ficClear",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_LEFT,
+			RTSurvival.category
+        )
+    );
+	public static final KeyBinding tetherClearBinding = KeyBindingHelper.registerKeyBinding(
+        new KeyBinding(
+            "binding.rtsurvival.tetherClear",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_RIGHT,
+			RTSurvival.category
+        )
+    );
+	public static final KeyBinding ficCurrentHeldItem = KeyBindingHelper.registerKeyBinding(
+        new KeyBinding(
+            "binding.rtsurvival.ficCurrentItem",
+            InputUtil.Type.KEYSYM,
+            GLFW.GLFW_KEY_DOWN,
+			RTSurvival.category
+        )
+    );
 
 	@Override
 	public void onInitializeClient() {
-		ClientPlayNetworking.registerGlobalReceiver(rtIdentifier, new RTSurvivalReceiver());
+		ClientPlayNetworking.registerGlobalReceiver(rtIdentifier, RTSurvivalReceiver.INSTANCE);
 		C2SPlayChannelEvents.REGISTER.register(
 			(clientPlayNetworkHandler, packetSender, minecraftClient, ids) -> {
 				for (Identifier id : ids) {
 					if (id.equals(RTSurvival.rtIdentifier)) {
 						try {
-							packetSender.sendPacket(
-								rtIdentifier,
-								this.packetToByteBuf(new RTRegister(RTSurvival.protocolVersion))
+							clientPlayNetworkHandler.sendPacket(
+								ClientPlayNetworking.createC2SPacket(
+									rtIdentifier,
+									RTSurvival.packetToByteBuf(new RTRegister(RTSurvival.protocolVersion))
+								)
 							);
 						} catch (IOException e) {
 							e.printStackTrace();
@@ -143,93 +138,23 @@ public class RTSurvival implements ClientModInitializer {
 			}
 		);
 		ClientTickEvents.END_CLIENT_TICK.register(
-			client -> {
-				boolean needToUpdateConfig = false;
-
-				while (toggleWaypointsKeyBinding.wasPressed()) {
-					boolean current = State.config.renderWaypoints;
-					State.config.renderWaypoints = !current; // ok to be non-atomic since this is the only thread writing to this variable
-					needToUpdateConfig = true;
-
-					if (current) {
-						State.hoveredWaypoint = null;
-					}
-				}
-
-				while (toggleWaypointFullNamesKeyBinding.wasPressed()) {
-					State.config.fullWaypointNames = !State.config.fullWaypointNames; // ok to be non-atomic since this is the only thread writing to this variable
-					needToUpdateConfig = true;
-				}
-
-				while (toggleHighlightClosestBinding.wasPressed()) {
-					State.config.highlightClosest = !State.config.highlightClosest; // ok to be non-atomic since this is the only thread writing to this variable
-					needToUpdateConfig = true;
-				}
-
-				while (stogKeyBinding.wasPressed()) {
-					this.sendPacket(new RTSTog());
-				}
-
-				while (ficClearBinding.wasPressed()) {
-					if (changeRenderScale.isPressed()) {
-						if (State.config.scale > .02f) State.config.scale -= .005f; // ok to be non-atomic since this is the only thread writing to this variable
-						needToUpdateConfig = true;
-					} else {
-						this.sendPacket(new RTFICClear());
-					}
-				}
-
-				while (tetherClearBinding.wasPressed()) {
-					if (changeRenderScale.isPressed()) {
-						if (State.config.scale < .1f) State.config.scale += .005f; // ok to be non-atomic since this is the only thread writing to this variable
-						needToUpdateConfig = true;
-					} else {
-						this.sendPacket(new RTTetherClear());
-					}
-				}
-
-				while (ficCurrentHeldItem.wasPressed()) {
-					this.sendPacket(new RTFIC());
-				}
-
-				while (tetherOnHoveredWaypoint.wasPressed()) {
-					RTWaypoint hoveredWaypoint = State.hoveredWaypoint;
-
-					if (hoveredWaypoint == null) {
-						continue;
-					}
-
-					this.sendPacket(new RTTetherOnHoveredWaypoint(hoveredWaypoint.name));
-				}
-
-				while (sTPToHoveredWaypoint.wasPressed()) {
-					RTWaypoint hoveredWaypoint = State.hoveredWaypoint;
-
-					if (hoveredWaypoint == null) {
-						continue;
-					}
-
-					this.sendPacket(new RTSTPToHoveredWaypoint(hoveredWaypoint.name));
-				}
-
-				if (needToUpdateConfig) this.saveConfig();
-			}
+			Keybindings::handle
 		);
 	}
 
-	private void sendPacket(RTPacket packet) {
+	public static void sendPacket(RTPacket packet) {
 		try {
 			ClientPlayNetworkHandler handler = MinecraftClient.getInstance().getNetworkHandler();
 
 			if (handler == null) return;
 
-			handler.sendPacket(ClientPlayNetworking.createC2SPacket(rtIdentifier, this.packetToByteBuf(packet)));
+			handler.sendPacket(ClientPlayNetworking.createC2SPacket(rtIdentifier, RTSurvival.packetToByteBuf(packet)));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 
-	private PacketByteBuf packetToByteBuf(RTPacket packet) throws IOException {
+	private static PacketByteBuf packetToByteBuf(RTPacket packet) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		ObjectOutputStream oos = new ObjectOutputStream(baos);
 		PacketByteBuf packetBuffer = PacketByteBufs.create();

@@ -12,6 +12,7 @@ import net.minecraft.util.math.Quaternion;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.dimension.DimensionType;
+import phonis.survival.RTConfig;
 import phonis.survival.State;
 import phonis.survival.networking.*;
 
@@ -27,9 +28,6 @@ public class RenderUtils {
     private static final RGBAColor yellow = new RGBAColor(255, 255, 0, 255);
     private static final RGBAColor white = new RGBAColor(255, 255, 255, 255);
     // private static final RGBAColor distanceBackground = new RGBAColor(0x40000000);
-    private static final RGBAColor distanceBackground = new RGBAColor(50, 50, 50, 255);
-    private static final RGBAColor plateBackground = new RGBAColor(50, 50, 120, 160);
-    private static final RGBAColor fullBackground = new RGBAColor(120, 50, 50, 200);
 
     private static boolean compareDimension(RTDimension dimension, DimensionType currentDimension) {
         return (dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.OVERWORLD_ID))
@@ -209,7 +207,7 @@ public class RenderUtils {
         State.hoveredWaypoint = closest;
 
         waypointState.stream().filter(waypoint -> !closest.name.equals(waypoint.name)).forEach(waypoint -> RenderUtils.drawWaypoint(currentDimension, waypoint, false));
-        RenderUtils.drawWaypoint(currentDimension, closest, State.config.highlightClosest);
+        RenderUtils.drawWaypoint(currentDimension, closest, RTConfig.INSTANCE.highlightClosest);
     }
 
     private static void drawWaypoint(DimensionType currentDimension, RTWaypoint closest, boolean full) {
@@ -257,7 +255,7 @@ public class RenderUtils {
         double realY;
         double realZ;
         double maxDistance = 10;
-        float targetScale = State.config.scale;
+        float targetScale = RTConfig.INSTANCE.scale / 1000f;
 
         if (distance > maxDistance) {
             Vec3d direction = new Vec3d(dx, dy, dz).normalize().multiply(maxDistance);
@@ -295,13 +293,13 @@ public class RenderUtils {
 
         if (text.length() == 0) return;
 
-        String adjustedText = (full || State.config.fullWaypointNames) ? text : text.substring(0, 1).toUpperCase();
+        String adjustedText = (full || RTConfig.INSTANCE.fullWaypointNames) ? text : text.substring(0, 1).toUpperCase();
         String distanceStr = (int) distance + "m";
         String[] fullText = full ? new String[] { adjustedText, (int) distance + "m" } : new String[] { adjustedText };
         int lineLen = textRenderer.getWidth(adjustedText);
         int strLenHalf = lineLen / 2;
         int textHeight = textRenderer.fontHeight - 1;
-        RGBAColor background = full ? RenderUtils.fullBackground : RenderUtils.plateBackground;
+        RGBAColor background = full ? RTConfig.INSTANCE.fullBackground : RTConfig.INSTANCE.plateBackground;
 
         RenderSystem.depthMask(false);
         RenderSystem.disableDepthTest();
@@ -318,10 +316,10 @@ public class RenderUtils {
             strLenHalf = lineLen / 2;
 
             buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-            buffer.vertex(-strLenHalf - 1,          textRenderer.fontHeight - 1, 0.0D).color(RenderUtils.distanceBackground.r, RenderUtils.distanceBackground.g, RenderUtils.distanceBackground.b, RenderUtils.distanceBackground.a).next();
-            buffer.vertex(-strLenHalf - 1,  textHeight + textRenderer.fontHeight, 0.0D).color(RenderUtils.distanceBackground.r, RenderUtils.distanceBackground.g, RenderUtils.distanceBackground.b, RenderUtils.distanceBackground.a).next();
-            buffer.vertex( strLenHalf    ,  textHeight + textRenderer.fontHeight, 0.0D).color(RenderUtils.distanceBackground.r, RenderUtils.distanceBackground.g, RenderUtils.distanceBackground.b, RenderUtils.distanceBackground.a).next();
-            buffer.vertex( strLenHalf    ,          textRenderer.fontHeight - 1, 0.0D).color(RenderUtils.distanceBackground.r, RenderUtils.distanceBackground.g, RenderUtils.distanceBackground.b, RenderUtils.distanceBackground.a).next();
+            buffer.vertex(-strLenHalf - 1,          textRenderer.fontHeight - 1, 0.0D).color(RTConfig.INSTANCE.distanceBackground.r, RTConfig.INSTANCE.distanceBackground.g, RTConfig.INSTANCE.distanceBackground.b, RTConfig.INSTANCE.distanceBackground.a).next();
+            buffer.vertex(-strLenHalf - 1,  textHeight + textRenderer.fontHeight, 0.0D).color(RTConfig.INSTANCE.distanceBackground.r, RTConfig.INSTANCE.distanceBackground.g, RTConfig.INSTANCE.distanceBackground.b, RTConfig.INSTANCE.distanceBackground.a).next();
+            buffer.vertex( strLenHalf    ,  textHeight + textRenderer.fontHeight, 0.0D).color(RTConfig.INSTANCE.distanceBackground.r, RTConfig.INSTANCE.distanceBackground.g, RTConfig.INSTANCE.distanceBackground.b, RTConfig.INSTANCE.distanceBackground.a).next();
+            buffer.vertex( strLenHalf    ,          textRenderer.fontHeight - 1, 0.0D).color(RTConfig.INSTANCE.distanceBackground.r, RTConfig.INSTANCE.distanceBackground.g, RTConfig.INSTANCE.distanceBackground.b, RTConfig.INSTANCE.distanceBackground.a).next();
             tessellator.draw();
         }
 

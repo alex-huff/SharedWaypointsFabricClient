@@ -8,7 +8,6 @@ import java.util.List;
 
 public class State {
 
-    public static final RTConfig config = RTConfig.load();
     public static volatile RTWaypoint hoveredWaypoint = null;
     public static volatile List<RTWaypoint> waypointState = null;
     public static volatile List<RTTether> tetherState = null;

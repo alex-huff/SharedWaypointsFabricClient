@@ -16,6 +16,8 @@ import java.util.stream.Collectors;
 
 public class RTSurvivalReceiver implements ClientPlayNetworking.PlayChannelHandler {
 
+    public static RTSurvivalReceiver INSTANCE = new RTSurvivalReceiver();
+
     @Override
     public void receive(MinecraftClient client, ClientPlayNetworkHandler handler, PacketByteBuf buf, PacketSender responseSender) {
         byte[] data = new byte[buf.readableBytes()];
