@@ -5,14 +5,11 @@ import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.network.PacketByteBuf;
-import phonis.survival.State;
+import phonis.survival.state.RTStateManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class RTSurvivalReceiver implements ClientPlayNetworking.PlayChannelHandler {
 
@@ -38,39 +35,17 @@ public class RTSurvivalReceiver implements ClientPlayNetworking.PlayChannelHandl
         if (packet instanceof RTUnsupported rtUnsupported) {
             System.out.println("Unsupported: " + rtUnsupported.protocolVersion);
         } else if (packet instanceof RTWaypointInitialize waypointInitialize) {
-            State.waypointState = waypointInitialize.waypoints;
+            RTStateManager.INSTANCE.initializeWaypoints(waypointInitialize.waypoints);
         } else if (packet instanceof RTWaypointUpdate waypointUpdate) {
-            if (State.waypointState == null) return;
-
-            List<RTWaypoint> newWaypointState = State.waypointState.stream().filter(waypoint -> !waypoint.name.equals(waypointUpdate.newWaypoint.name)).collect(Collectors.toList());
-
-            newWaypointState.add(waypointUpdate.newWaypoint);
-
-            State.waypointState = newWaypointState;
+            RTStateManager.INSTANCE.updateWaypoint(waypointUpdate.newWaypoint);
         } else if (packet instanceof RTWaypointRemove waypointRemove) {
-            if (State.waypointState == null) return;
-
-            List<RTWaypoint> newWaypointState = State.waypointState.stream().filter(waypoint -> !waypoint.name.equals(waypointRemove.toRemove)).collect(Collectors.toList());
-
-            State.waypointState = newWaypointState;
+            RTStateManager.INSTANCE.removeWaypoint(waypointRemove.toRemove);
         } else if (packet instanceof RTTetherUpdate tetherUpdate) {
-            if (State.tetherState == null) {
-                State.tetherState = Collections.singletonList(tetherUpdate.toUpdate);
-            } else {
-                List<RTTether> newTetherState = State.tetherState.stream().filter(tether -> !tether.equals(tetherUpdate.toUpdate)).collect(Collectors.toList());
-
-                newTetherState.add(tetherUpdate.toUpdate);
-
-                State.tetherState = newTetherState;
-            }
+            RTStateManager.INSTANCE.updateTether(tetherUpdate.toUpdate);
         } else if (packet instanceof RTTetherRemove tetherRemove) {
-            if (State.tetherState == null) return;
-
-            List<RTTether> newTetherState = State.tetherState.stream().filter(tether -> !tether.equals(tetherRemove.toRemove)).collect(Collectors.toList());
-
-            State.tetherState = newTetherState;
+            RTStateManager.INSTANCE.removeTether(tetherRemove.toRemove);
         } else if (packet instanceof RTChestFindSession chestFindSession) {
-            State.chestFindState = chestFindSession;
+            RTStateManager.INSTANCE.updateChestFindSession(chestFindSession);
         } else {
             System.out.println("Unrecognised packet.");
         }

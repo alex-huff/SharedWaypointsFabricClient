@@ -15,6 +15,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 import phonis.survival.networking.*;
+import phonis.survival.state.RTStateManager;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -26,7 +27,7 @@ public class RTSurvival implements ClientModInitializer {
 	public static final String configDirectory = "config/RTSurvival/";
 	public static final Identifier rtIdentifier = new Identifier("rtsurvival:main");
 	private static final String category = "category.rtsurvival.rtSurvival";
-	public static final KeyBinding openConfigScreen = KeyBindingHelper.registerKeyBinding(
+	public static final KeyBinding openConfigScreenKeyBinding = KeyBindingHelper.registerKeyBinding(
 		new KeyBinding(
 			"binding.rtsurvival.rtMenu",
 			InputUtil.Type.KEYSYM,
@@ -50,15 +51,23 @@ public class RTSurvival implements ClientModInitializer {
 			RTSurvival.category
         )
     );
-	public static final KeyBinding toggleHighlightClosestBinding = KeyBindingHelper.registerKeyBinding(
+	public static final KeyBinding toggleHighlightClosestKeyBinding = KeyBindingHelper.registerKeyBinding(
 		new KeyBinding(
-			"binding.rtsurvival.closestHighlight",
+			"binding.rtsurvival.toggleClosestHighlight",
 			InputUtil.Type.KEYSYM,
 			GLFW.GLFW_KEY_UNKNOWN,
 			RTSurvival.category
 		)
 	);
-	public static final KeyBinding tetherOnHoveredWaypoint = KeyBindingHelper.registerKeyBinding(
+	public static final KeyBinding toggleCrossDimensionalWaypointsKeyBinding = KeyBindingHelper.registerKeyBinding(
+		new KeyBinding(
+			"binding.rtsurvival.toggleCrossDimensional",
+			InputUtil.Type.KEYSYM,
+			GLFW.GLFW_KEY_UNKNOWN,
+			RTSurvival.category
+		)
+	);
+	public static final KeyBinding tetherOnHoveredWaypointKeyBinding = KeyBindingHelper.registerKeyBinding(
 		new KeyBinding(
 			"binding.rtsurvival.tetherHoveredWaypoint",
 			InputUtil.Type.KEYSYM,
@@ -66,7 +75,7 @@ public class RTSurvival implements ClientModInitializer {
 			RTSurvival.category
 		)
 	);
-	public static final KeyBinding sTPToHoveredWaypoint = KeyBindingHelper.registerKeyBinding(
+	public static final KeyBinding sTPToHoveredWaypointKeyBinding = KeyBindingHelper.registerKeyBinding(
 		new KeyBinding(
 			"binding.rtsurvival.stpHoveredWaypoint",
 			InputUtil.Type.KEYSYM,
@@ -82,7 +91,7 @@ public class RTSurvival implements ClientModInitializer {
 			RTSurvival.category
         )
     );
-	public static final KeyBinding ficClearBinding = KeyBindingHelper.registerKeyBinding(
+	public static final KeyBinding ficClearKeyBinding = KeyBindingHelper.registerKeyBinding(
         new KeyBinding(
             "binding.rtsurvival.ficClear",
             InputUtil.Type.KEYSYM,
@@ -90,7 +99,7 @@ public class RTSurvival implements ClientModInitializer {
 			RTSurvival.category
         )
     );
-	public static final KeyBinding tetherClearBinding = KeyBindingHelper.registerKeyBinding(
+	public static final KeyBinding tetherClearKeyBinding = KeyBindingHelper.registerKeyBinding(
         new KeyBinding(
             "binding.rtsurvival.tetherClear",
             InputUtil.Type.KEYSYM,
@@ -98,7 +107,7 @@ public class RTSurvival implements ClientModInitializer {
 			RTSurvival.category
         )
     );
-	public static final KeyBinding ficCurrentHeldItem = KeyBindingHelper.registerKeyBinding(
+	public static final KeyBinding ficCurrentHeldItemKeyBinding = KeyBindingHelper.registerKeyBinding(
         new KeyBinding(
             "binding.rtsurvival.ficCurrentItem",
             InputUtil.Type.KEYSYM,
@@ -132,9 +141,7 @@ public class RTSurvival implements ClientModInitializer {
 		);
 		ClientPlayConnectionEvents.DISCONNECT.register(
 			(clientPlayNetworkHandler, minecraftClient) -> {
-				State.waypointState = null;
-				State.tetherState = null;
-				State.chestFindState = null;
+				RTStateManager.INSTANCE.clearState();
 			}
 		);
 		ClientTickEvents.END_CLIENT_TICK.register(

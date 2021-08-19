@@ -3,19 +3,22 @@ package phonis.survival;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.clothconfig2.gui.entries.KeyCodeEntry;
+import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.text.TranslatableText;
 import phonis.survival.networking.*;
+import phonis.survival.state.RTStateManager;
 
 public class Keybindings {
 
     public static void handle(MinecraftClient client) {
         boolean needToUpdateConfig = false;
 
-        while (RTSurvival.openConfigScreen.wasPressed()) {
+        while (RTSurvival.openConfigScreenKeyBinding.wasPressed()) {
             Keybindings.openConfig(client);
         }
 
@@ -24,7 +27,7 @@ public class Keybindings {
             needToUpdateConfig = true;
 
             if (!RTConfig.INSTANCE.renderWaypoints) {
-                State.hoveredWaypoint = null;
+                RTStateManager.INSTANCE.clearHoveredWaypoint();
             }
         }
 
@@ -33,8 +36,13 @@ public class Keybindings {
             needToUpdateConfig = true;
         }
 
-        while (RTSurvival.toggleHighlightClosestBinding.wasPressed()) {
+        while (RTSurvival.toggleHighlightClosestKeyBinding.wasPressed()) {
             RTConfig.INSTANCE.highlightClosest = !RTConfig.INSTANCE.highlightClosest;
+            needToUpdateConfig = true;
+        }
+
+        while (RTSurvival.toggleCrossDimensionalWaypointsKeyBinding.wasPressed()) {
+            RTConfig.INSTANCE.crossDimensionalWaypoints = !RTConfig.INSTANCE.crossDimensionalWaypoints;
             needToUpdateConfig = true;
         }
 
@@ -42,36 +50,36 @@ public class Keybindings {
             RTSurvival.sendPacket(new RTSTog());
         }
 
-        while (RTSurvival.ficClearBinding.wasPressed()) {
+        while (RTSurvival.ficClearKeyBinding.wasPressed()) {
             RTSurvival.sendPacket(new RTFICClear());
         }
 
-        while (RTSurvival.tetherClearBinding.wasPressed()) {
+        while (RTSurvival.tetherClearKeyBinding.wasPressed()) {
             RTSurvival.sendPacket(new RTTetherClear());
         }
 
-        while (RTSurvival.ficCurrentHeldItem.wasPressed()) {
+        while (RTSurvival.ficCurrentHeldItemKeyBinding.wasPressed()) {
             RTSurvival.sendPacket(new RTFIC());
         }
 
-        while (RTSurvival.tetherOnHoveredWaypoint.wasPressed()) {
-            RTWaypoint hoveredWaypoint = State.hoveredWaypoint;
+        while (RTSurvival.tetherOnHoveredWaypointKeyBinding.wasPressed()) {
+            String hoveredWaypointName = RTStateManager.INSTANCE.getHoveredWaypoint();
 
-            if (hoveredWaypoint == null) {
+            if (hoveredWaypointName == null) {
                 continue;
             }
 
-            RTSurvival.sendPacket(new RTTetherOnHoveredWaypoint(hoveredWaypoint.name));
+            RTSurvival.sendPacket(new RTTetherOnHoveredWaypoint(hoveredWaypointName));
         }
 
-        while (RTSurvival.sTPToHoveredWaypoint.wasPressed()) {
-            RTWaypoint hoveredWaypoint = State.hoveredWaypoint;
+        while (RTSurvival.sTPToHoveredWaypointKeyBinding.wasPressed()) {
+            String hoveredWaypointName = RTStateManager.INSTANCE.getHoveredWaypoint();
 
-            if (hoveredWaypoint == null) {
+            if (hoveredWaypointName == null) {
                 continue;
             }
 
-            RTSurvival.sendPacket(new RTSTPToHoveredWaypoint(hoveredWaypoint.name));
+            RTSurvival.sendPacket(new RTSTPToHoveredWaypoint(hoveredWaypointName));
         }
 
         if (needToUpdateConfig) {
@@ -90,17 +98,26 @@ public class Keybindings {
         ConfigCategory category = builder.getOrCreateCategory(new TranslatableText("category.rtsurvival.general"));
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
 
-        Keybindings.addKeybindingEntryToCategory(category, entryBuilder, RTSurvival.openConfigScreen, "binding.rtsurvival.rtMenu");
-        Keybindings.addKeybindingEntryToCategory(category, entryBuilder, RTSurvival.ficCurrentHeldItem, "binding.rtsurvival.ficCurrentItem");
-        Keybindings.addKeybindingEntryToCategory(category, entryBuilder, RTSurvival.stogKeyBinding, "binding.rtsurvival.spectog");
-        Keybindings.addKeybindingEntryToCategory(category, entryBuilder, RTSurvival.ficClearBinding, "binding.rtsurvival.ficClear");
-        Keybindings.addKeybindingEntryToCategory(category, entryBuilder, RTSurvival.tetherClearBinding, "binding.rtsurvival.tetherClear");
+        SubCategoryBuilder subCategoryBuilder = entryBuilder.startSubCategory(new TranslatableText("category.rtsurvival.general.keybindings"));
+
+        Keybindings.addKeybindingEntryToSubCategory(subCategoryBuilder, entryBuilder, RTSurvival.openConfigScreenKeyBinding, "binding.rtsurvival.rtMenu");
+        Keybindings.addKeybindingEntryToSubCategory(subCategoryBuilder, entryBuilder, RTSurvival.ficCurrentHeldItemKeyBinding, "binding.rtsurvival.ficCurrentItem");
+        Keybindings.addKeybindingEntryToSubCategory(subCategoryBuilder, entryBuilder, RTSurvival.stogKeyBinding, "binding.rtsurvival.spectog");
+        Keybindings.addKeybindingEntryToSubCategory(subCategoryBuilder, entryBuilder, RTSurvival.ficClearKeyBinding, "binding.rtsurvival.ficClear");
+        Keybindings.addKeybindingEntryToSubCategory(subCategoryBuilder, entryBuilder, RTSurvival.tetherClearKeyBinding, "binding.rtsurvival.tetherClear");
+
+        category.addEntry(
+            subCategoryBuilder
+                .setExpanded(true)
+                .setTooltip(new TranslatableText("tooltip.rtsurvival.general.keybindings"))
+                .build()
+        );
 
         category = builder.getOrCreateCategory(new TranslatableText("category.rtsurvival.waypoints"));
 
         category.addEntry(
             entryBuilder.startBooleanToggle(new TranslatableText("option.rtsurvival.toggleWaypoints"), RTConfig.INSTANCE.renderWaypoints)
-                .setDefaultValue(true)
+                .setDefaultValue(RTConfig.defaultRenderWaypoints)
                 .setTooltip(new TranslatableText("tooltip.rtsurvival.toggleWaypoints"))
                 .setSaveConsumer(
                     newValue -> {
@@ -114,7 +131,7 @@ public class Keybindings {
 
         category.addEntry(
             entryBuilder.startBooleanToggle(new TranslatableText("option.rtsurvival.fullWaypointNames"), RTConfig.INSTANCE.fullWaypointNames)
-                .setDefaultValue(true)
+                .setDefaultValue(RTConfig.defaultFullWaypointNames)
                 .setTooltip(new TranslatableText("tooltip.rtsurvival.fullWaypointNames"))
                 .setSaveConsumer(
                     newValue -> {
@@ -128,7 +145,7 @@ public class Keybindings {
 
         category.addEntry(
             entryBuilder.startBooleanToggle(new TranslatableText("option.rtsurvival.highlightHoveredWaypoint"), RTConfig.INSTANCE.highlightClosest)
-                .setDefaultValue(true)
+                .setDefaultValue(RTConfig.defaultHighlightClosest)
                 .setTooltip(new TranslatableText("tooltip.rtsurvival.highlightHoveredWaypoint"))
                 .setSaveConsumer(
                     newValue -> {
@@ -141,8 +158,22 @@ public class Keybindings {
         );
 
         category.addEntry(
+            entryBuilder.startBooleanToggle(new TranslatableText("option.rtsurvival.crossDimensionalWaypoints"), RTConfig.INSTANCE.crossDimensionalWaypoints)
+                .setDefaultValue(RTConfig.defaultCrossDimensionalWaypoints)
+                .setTooltip(new TranslatableText("tooltip.rtsurvival.crossDimensionalWaypoints"))
+                .setSaveConsumer(
+                    newValue -> {
+                        RTConfig.INSTANCE.crossDimensionalWaypoints = newValue;
+
+                        RTConfig.trySave();
+                    }
+                )
+                .build()
+        );
+
+        category.addEntry(
             entryBuilder.startIntSlider(new TranslatableText("option.rtsurvival.renderScale"), RTConfig.INSTANCE.scale, 0, 100)
-                .setDefaultValue(50)
+                .setDefaultValue(RTConfig.defaultRenderScale)
                 .setTooltip(new TranslatableText("tooltip.rtsurvival.renderScale"))
                 .setSaveConsumer(
                     (value) -> {
@@ -238,20 +269,29 @@ public class Keybindings {
                 .build()
         );
 
-        Keybindings.addKeybindingEntryToCategory(category, entryBuilder, RTSurvival.toggleWaypointsKeyBinding, "binding.rtsurvival.toggleWaypoints");
-        Keybindings.addKeybindingEntryToCategory(category, entryBuilder, RTSurvival.toggleWaypointFullNamesKeyBinding, "binding.rtsurvival.toggleFullNames");
-        Keybindings.addKeybindingEntryToCategory(category, entryBuilder, RTSurvival.toggleHighlightClosestBinding, "binding.rtsurvival.closestHighlight");
-        Keybindings.addKeybindingEntryToCategory(category, entryBuilder, RTSurvival.tetherOnHoveredWaypoint, "binding.rtsurvival.tetherHoveredWaypoint");
-        Keybindings.addKeybindingEntryToCategory(category, entryBuilder, RTSurvival.sTPToHoveredWaypoint, "binding.rtsurvival.stpHoveredWaypoint");
+        subCategoryBuilder = entryBuilder.startSubCategory(new TranslatableText("category.rtsurvival.waypoints.keybindings"));
+
+        Keybindings.addKeybindingEntryToSubCategory(subCategoryBuilder, entryBuilder, RTSurvival.toggleWaypointsKeyBinding, "binding.rtsurvival.toggleWaypoints");
+        Keybindings.addKeybindingEntryToSubCategory(subCategoryBuilder, entryBuilder, RTSurvival.toggleWaypointFullNamesKeyBinding, "binding.rtsurvival.toggleFullNames");
+        Keybindings.addKeybindingEntryToSubCategory(subCategoryBuilder, entryBuilder, RTSurvival.toggleHighlightClosestKeyBinding, "binding.rtsurvival.toggleClosestHighlight");
+        Keybindings.addKeybindingEntryToSubCategory(subCategoryBuilder, entryBuilder, RTSurvival.toggleCrossDimensionalWaypointsKeyBinding, "binding.rtsurvival.toggleCrossDimensional");
+        Keybindings.addKeybindingEntryToSubCategory(subCategoryBuilder, entryBuilder, RTSurvival.tetherOnHoveredWaypointKeyBinding, "binding.rtsurvival.tetherHoveredWaypoint");
+        Keybindings.addKeybindingEntryToSubCategory(subCategoryBuilder, entryBuilder, RTSurvival.sTPToHoveredWaypointKeyBinding, "binding.rtsurvival.stpHoveredWaypoint");
+
+        category.addEntry(
+            subCategoryBuilder
+                .setExpanded(false)
+                .setTooltip(new TranslatableText("tooltip.rtsurvival.waypoints.keybindings"))
+                .build()
+        );
 
         Screen screen = builder.build();
 
         client.setScreen(screen);
     }
 
-    private static void addKeybindingEntryToCategory(ConfigCategory category, ConfigEntryBuilder entryBuilder, KeyBinding keyBinding, String translationKey) {
-        category.addEntry(
-            entryBuilder.startKeyCodeField(new TranslatableText(translationKey), KeyBindingHelper.getBoundKeyOf(keyBinding))
+    private static KeyCodeEntry getKeybindingOption(ConfigEntryBuilder entryBuilder, KeyBinding keyBinding, String translationKey) {
+        return entryBuilder.startKeyCodeField(new TranslatableText(translationKey), KeyBindingHelper.getBoundKeyOf(keyBinding))
             .setDefaultValue(keyBinding.getDefaultKey())
             .setSaveConsumer(
                 (code) -> {
@@ -260,8 +300,15 @@ public class Keybindings {
                     MinecraftClient.getInstance().options.write();
                 }
             )
-            .build()
-        );
+            .build();
+    }
+
+    private static void addKeybindingEntryToSubCategory(SubCategoryBuilder subCategoryBuilder, ConfigEntryBuilder entryBuilder, KeyBinding keyBinding, String translationKey) {
+        subCategoryBuilder.add(Keybindings.getKeybindingOption(entryBuilder, keyBinding, translationKey));
+    }
+
+    private static void addKeybindingEntryToCategory(ConfigCategory category, ConfigEntryBuilder entryBuilder, KeyBinding keyBinding, String translationKey) {
+        category.addEntry(Keybindings.getKeybindingOption(entryBuilder, keyBinding, translationKey));
     }
 
 }

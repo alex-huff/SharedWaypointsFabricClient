@@ -13,8 +13,8 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3f;
 import net.minecraft.world.dimension.DimensionType;
 import phonis.survival.RTConfig;
-import phonis.survival.State;
 import phonis.survival.networking.*;
+import phonis.survival.state.RTStateManager;
 
 import java.util.Comparator;
 import java.util.List;
@@ -36,7 +36,7 @@ public class RenderUtils {
     }
 
     public static void renderChestFindSession(DimensionType currentDimension) {
-        RTChestFindSession chestFindState = State.chestFindState;
+        RTChestFindSession chestFindState = RTStateManager.INSTANCE.getChestFindSession();
 
         if (chestFindState == null) return;
 
@@ -70,16 +70,18 @@ public class RenderUtils {
     }
 
     public static void renderTethers(DimensionType currentDimension) {
-        List<RTTether> tetherState = State.tetherState;
+        RTStateManager.INSTANCE.withTethers(
+            (tetherState) -> {
+                if (tetherState == null || tetherState.isEmpty()) return;
 
-        if (tetherState == null) return;
-
-        for (RTTether tether : tetherState) {
-            if (RenderUtils.compareDimension(tether.location.dimension, currentDimension))
-                RenderUtils.drawTether(tether.location.x, tether.location.y, tether.location.z, Double.MAX_VALUE, RenderUtils.white, RenderUtils.red);
-            else if (tether.location.dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID))
-                RenderUtils.drawTether(tether.location.x / 8d, 128d, tether.location.z / 8d, Double.MAX_VALUE, RenderUtils.white, RenderUtils.red);
-        }
+                for (RTTether tether : tetherState) {
+                    if (RenderUtils.compareDimension(tether.location.dimension, currentDimension))
+                        RenderUtils.drawTether(tether.location.x, tether.location.y, tether.location.z, Double.MAX_VALUE, RenderUtils.white, RenderUtils.red);
+                    else if (tether.location.dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID))
+                        RenderUtils.drawTether(tether.location.x / 8d, 128d, tether.location.z / 8d, Double.MAX_VALUE, RenderUtils.white, RenderUtils.red);
+                }
+            }
+        );
     }
 
     private static void drawTether(double x, double y, double z, double length, RGBAColor... lineColors) {
@@ -168,57 +170,57 @@ public class RenderUtils {
     }
 
     public static void renderWaypoints(DimensionType currentDimension) {
-        List<RTWaypoint> waypointState = State.waypointState;
+        RTStateManager.INSTANCE.withWaypoints(
+            (waypointState) -> {
+                if (waypointState == null || waypointState.isEmpty()) return;
 
-        if (waypointState == null) return;
+                Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
+                Vec3d cameraPos = camera.getPos();
+                double cx = cameraPos.x;
+                double cy = cameraPos.y;
+                double cz = cameraPos.z;
 
-        Camera camera = MinecraftClient.getInstance().gameRenderer.getCamera();
-        Vec3d cameraPos = camera.getPos();
-        double cx = cameraPos.x;
-        double cy = cameraPos.y;
-        double cz = cameraPos.z;
+                RTWaypoint closest = waypointState.stream().filter(
+                    waypoint -> (RenderUtils.compareDimension(waypoint.location.dimension, currentDimension)) ||
+                        (RTConfig.INSTANCE.crossDimensionalWaypoints && (waypoint.location.dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID)))
+                ).min(
+                    Comparator.comparingDouble(
+                        waypoint -> {
+                            boolean adjusted = waypoint.location.dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID);
+                            double dx = adjusted ? waypoint.location.x / 8d - cx : waypoint.location.x - cx;
+                            double dy = adjusted ? 128d - cy : waypoint.location.y - cy;
+                            double dz = adjusted ? waypoint.location.z / 8d - cz : waypoint.location.z - cz;
+                            Vec3d waypointDirection = new Vec3d(dx, dy, dz).normalize();
+                            double rotX = camera.getYaw();
+                            double rotY = camera.getPitch();
+                            double xz = Math.cos(Math.toRadians(rotY));
+                            double cxD = -xz * Math.sin(Math.toRadians(rotX));
+                            double cyD = -Math.sin(Math.toRadians(rotY));
+                            double czD = xz * Math.cos(Math.toRadians(rotX));
+                            Vec3d cameraDirection = new Vec3d(cxD, cyD, czD).normalize();
 
-        RTWaypoint closest = waypointState.stream().filter(
-            waypoint -> (RenderUtils.compareDimension(waypoint.location.dimension, currentDimension)) ||
-                (waypoint.location.dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID))
-        ).min(
-            Comparator.comparingDouble(
-                waypoint -> {
-                    boolean adjusted = waypoint.location.dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID);
-                    double dx = adjusted ? waypoint.location.x / 8d - cx : waypoint.location.x - cx;
-                    double dy = adjusted ? 128d - cy : waypoint.location.y - cy;
-                    double dz = adjusted ? waypoint.location.z / 8d - cz : waypoint.location.z - cz;
-                    Vec3d waypointDirection = new Vec3d(dx, dy, dz).normalize();
-                    double rotX = camera.getYaw();
-                    double rotY = camera.getPitch();
-                    double xz = Math.cos(Math.toRadians(rotY));
-                    double cxD = -xz * Math.sin(Math.toRadians(rotX));
-                    double cyD = -Math.sin(Math.toRadians(rotY));
-                    double czD = xz * Math.cos(Math.toRadians(rotX));
-                    Vec3d cameraDirection = new Vec3d(cxD, cyD, czD).normalize();
+                            return cameraDirection.distanceTo(waypointDirection);
+                        }
+                    )
+                ).orElse(null);
 
-                    return cameraDirection.distanceTo(waypointDirection);
-                }
-            )
-        ).orElse(null);
+                if (closest == null) return;
 
-        if (closest == null) return;
-
-        State.hoveredWaypoint = closest;
-
-        waypointState.stream().filter(waypoint -> !closest.name.equals(waypoint.name)).forEach(waypoint -> RenderUtils.drawWaypoint(currentDimension, waypoint, false));
-        RenderUtils.drawWaypoint(currentDimension, closest, RTConfig.INSTANCE.highlightClosest);
+                RTStateManager.INSTANCE.setHoveredWaypoint(closest.name);
+                waypointState.stream().filter(waypoint -> !closest.name.equals(waypoint.name)).forEach(waypoint -> RenderUtils.drawWaypoint(currentDimension, waypoint, false));
+                RenderUtils.drawWaypoint(currentDimension, closest, RTConfig.INSTANCE.highlightClosest);
+            }
+        );
     }
 
-    private static void drawWaypoint(DimensionType currentDimension, RTWaypoint closest, boolean full) {
-        if (RenderUtils.compareDimension(closest.location.dimension, currentDimension))
-            RenderUtils.drawTextPlate(closest.name, closest.location.x, closest.location.y, closest.location.z, full);
-        else if (closest.location.dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID))
-            RenderUtils.drawTextPlate(closest.name, closest.location.x / 8d, 128d, closest.location.z / 8d, full);
+    private static void drawWaypoint(DimensionType currentDimension, RTWaypoint waypoint, boolean full) {
+        if (RenderUtils.compareDimension(waypoint.location.dimension, currentDimension))
+            RenderUtils.drawTextPlate(waypoint.name, waypoint.location.x, waypoint.location.y, waypoint.location.z, full);
+        else if (RTConfig.INSTANCE.crossDimensionalWaypoints && waypoint.location.dimension == RTDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID))
+            RenderUtils.drawTextPlate(waypoint.name, waypoint.location.x / 8d, 128d, waypoint.location.z / 8d, full);
     }
 
-    private static void setupBlend()
-    {
+    private static void setupBlend() {
         RenderSystem.enableBlend();
         RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.SRC_ALPHA, GlStateManager.DstFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
     }
@@ -228,8 +230,7 @@ public class RenderUtils {
         RenderSystem.setShaderColor(r, g, b, a);
     }
 
-    private static void drawTextPlate(String text, double x, double y, double z, boolean full)
-    {
+    private static void drawTextPlate(String text, double x, double y, double z, boolean full) {
         Entity entity = MinecraftClient.getInstance().getCameraEntity();
 
         if (entity != null)

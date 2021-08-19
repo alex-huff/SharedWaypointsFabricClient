@@ -16,6 +16,7 @@ public class RTConfig implements Serializable {
 
     public static final String configFile = RTSurvival.configDirectory + "RTConfig.json";
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    public static final boolean defaultCrossDimensionalWaypoints = true;
     public static final boolean defaultHighlightClosest = true;
     public static final boolean defaultRenderWaypoints = true;
     public static final boolean defaultFullWaypointNames = true;
@@ -25,6 +26,7 @@ public class RTConfig implements Serializable {
     public static final RGBAColor defaultDistanceBackground = new RGBAColor(50, 50, 50, 255);
     public static final RTConfig INSTANCE = RTConfig.load();
 
+    public boolean crossDimensionalWaypoints;
     public boolean highlightClosest;
     public boolean renderWaypoints;
     public boolean fullWaypointNames;
@@ -34,6 +36,7 @@ public class RTConfig implements Serializable {
     public RGBAColor distanceBackground;
 
     public RTConfig() {
+        this.crossDimensionalWaypoints = RTConfig.defaultCrossDimensionalWaypoints;
         this.highlightClosest = RTConfig.defaultHighlightClosest;
         this.renderWaypoints = RTConfig.defaultRenderWaypoints;
         this.fullWaypointNames = RTConfig.defaultFullWaypointNames;
