@@ -17,7 +17,6 @@ import phonis.survival.networking.*;
 import phonis.survival.state.RTStateManager;
 
 import java.util.Comparator;
-import java.util.List;
 
 // adapted from Masa's malilib
 

@@ -18,8 +18,8 @@ import phonis.survival.networking.*;
 import phonis.survival.state.RTStateManager;
 
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 
 public class RTSurvival implements ClientModInitializer {
 
@@ -163,11 +163,12 @@ public class RTSurvival implements ClientModInitializer {
 
 	private static PacketByteBuf packetToByteBuf(RTPacket packet) throws IOException {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ObjectOutputStream oos = new ObjectOutputStream(baos);
+		DataOutputStream das = new DataOutputStream(baos);
 		PacketByteBuf packetBuffer = PacketByteBufs.create();
 
-		oos.writeObject(packet);
-		oos.flush();
+		das.writeByte(packet.getID());
+		packet.toBytes(das);
+		das.close();
 		packetBuffer.writeBytes(baos.toByteArray());
 
 		return packetBuffer;

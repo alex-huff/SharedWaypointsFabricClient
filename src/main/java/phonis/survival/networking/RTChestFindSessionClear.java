@@ -4,11 +4,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class RTTetherClear implements RTPacket {
+public class RTChestFindSessionClear implements RTPacket {
 
     @Override
     public byte getID() {
-        return Packets.Out.RTTetherClearID;
+        return Packets.In.RTChestFindSessionClearID;
     }
 
     @Override
@@ -16,8 +16,8 @@ public class RTTetherClear implements RTPacket {
 
     }
 
-    public static RTTetherClear fromBytes(DataInputStream dis) {
-        return new RTTetherClear();
+    public static RTChestFindSessionClear fromBytes(DataInputStream dis) {
+        return new RTChestFindSessionClear();
     }
 
 }

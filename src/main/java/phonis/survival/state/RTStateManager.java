@@ -80,4 +80,8 @@ public class RTStateManager {
         return this.chestFindSession;
     }
 
+    public synchronized void clearChestFindSession() {
+        this.chestFindSession = null;
+    }
+
 }

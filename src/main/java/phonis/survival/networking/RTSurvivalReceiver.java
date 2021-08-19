@@ -8,8 +8,8 @@ import net.minecraft.network.PacketByteBuf;
 import phonis.survival.state.RTStateManager;
 
 import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 
 public class RTSurvivalReceiver implements ClientPlayNetworking.PlayChannelHandler {
 
@@ -22,11 +22,23 @@ public class RTSurvivalReceiver implements ClientPlayNetworking.PlayChannelHandl
         buf.getBytes(0, data);
 
         try {
-            ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(data));
-            RTPacket packet = (RTPacket) ois.readObject();
+            DataInputStream dis = new DataInputStream(new ByteArrayInputStream(data));
+            byte packetID = dis.readByte();
+            RTPacket packet = switch (packetID) {
+                case Packets.In.RTUnsupportedID -> RTUnsupported.fromBytes(dis);
+                case Packets.In.RTWaypointInitializeID -> RTWaypointInitialize.fromBytes(dis);
+                case Packets.In.RTWaypointUpdateID -> RTWaypointUpdate.fromBytes(dis);
+                case Packets.In.RTWaypointRemoveID -> RTWaypointRemove.fromBytes(dis);
+                case Packets.In.RTTetherUpdateID -> RTTetherUpdate.fromBytes(dis);
+                case Packets.In.RTTetherRemoveID -> RTTetherRemove.fromBytes(dis);
+                case Packets.In.RTChestFindSessionID -> RTChestFindSession.fromBytes(dis);
+                case Packets.In.RTChestFindSessionClearID -> RTChestFindSessionClear.fromBytes(dis);
+                default -> null;
+            };
 
+            dis.close();
             this.handlePacket(client, responseSender, packet);
-        } catch (IOException | ClassNotFoundException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -46,6 +58,8 @@ public class RTSurvivalReceiver implements ClientPlayNetworking.PlayChannelHandl
             RTStateManager.INSTANCE.removeTether(tetherRemove.toRemove);
         } else if (packet instanceof RTChestFindSession chestFindSession) {
             RTStateManager.INSTANCE.updateChestFindSession(chestFindSession);
+        } else if (packet instanceof RTChestFindSessionClear) {
+            RTStateManager.INSTANCE.clearChestFindSession();
         } else {
             System.out.println("Unrecognised packet.");
         }

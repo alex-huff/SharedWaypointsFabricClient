@@ -1,6 +1,12 @@
 package phonis.survival.networking;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+
 public class RTTetherDeathPoint extends RTTether {
+
+    public static final byte ID = 0x00;
 
     public RTTetherDeathPoint(RTLocation location) {
         super(location);
@@ -14,6 +20,20 @@ public class RTTetherDeathPoint extends RTTether {
         }
 
         return false;
+    }
+
+    @Override
+    public byte getTetherID() {
+        return RTTetherDeathPoint.ID;
+    }
+
+    @Override
+    protected void writeTether(DataOutputStream dos) throws IOException {
+        this.location.toBytes(dos);
+    }
+
+    public static RTTetherDeathPoint fromBytes(DataInputStream dis) throws IOException {
+        return new RTTetherDeathPoint(RTLocation.fromBytes(dis));
     }
 
 }

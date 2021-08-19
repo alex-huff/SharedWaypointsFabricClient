@@ -1,8 +1,10 @@
 package phonis.survival.networking;
 
-import java.io.Serializable;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
-public class RTLocation implements Serializable {
+public class RTLocation implements RTSerializable {
 
     public final RTDimension dimension;
     public final double x;
@@ -18,9 +20,7 @@ public class RTLocation implements Serializable {
 
     @Override
     public boolean equals(Object other) {
-        if (other instanceof RTLocation) {
-            RTLocation otherLocation = (RTLocation) other;
-
+        if (other instanceof RTLocation otherLocation) {
             return this.dimension.equals(otherLocation.dimension) &&
                 this.x == otherLocation.x &&
                 this.y == otherLocation.y &&
@@ -28,6 +28,23 @@ public class RTLocation implements Serializable {
         }
 
         return false;
+    }
+
+    @Override
+    public void toBytes(DataOutputStream dos) throws IOException {
+        dos.writeByte(this.dimension.ordinal());
+        dos.writeDouble(this.x);
+        dos.writeDouble(this.y);
+        dos.writeDouble(this.z);
+    }
+
+    public static RTLocation fromBytes(DataInputStream dis) throws IOException {
+        return new RTLocation(
+            RTDimension.values()[dis.readByte()],
+            dis.readDouble(),
+            dis.readDouble(),
+            dis.readDouble()
+        );
     }
 
 }
