@@ -120,11 +120,7 @@ public class Keybindings {
                 .setDefaultValue(RTConfig.defaultRenderWaypoints)
                 .setTooltip(new TranslatableText("tooltip.rtsurvival.toggleWaypoints"))
                 .setSaveConsumer(
-                    newValue -> {
-                        RTConfig.INSTANCE.renderWaypoints = newValue;
-
-                        RTConfig.trySave();
-                    }
+                    newValue -> RTConfig.INSTANCE.renderWaypoints = newValue
                 )
                 .build()
         );
@@ -134,11 +130,7 @@ public class Keybindings {
                 .setDefaultValue(RTConfig.defaultFullWaypointNames)
                 .setTooltip(new TranslatableText("tooltip.rtsurvival.fullWaypointNames"))
                 .setSaveConsumer(
-                    newValue -> {
-                        RTConfig.INSTANCE.fullWaypointNames = newValue;
-
-                        RTConfig.trySave();
-                    }
+                    newValue -> RTConfig.INSTANCE.fullWaypointNames = newValue
                 )
                 .build()
         );
@@ -148,11 +140,7 @@ public class Keybindings {
                 .setDefaultValue(RTConfig.defaultHighlightClosest)
                 .setTooltip(new TranslatableText("tooltip.rtsurvival.highlightHoveredWaypoint"))
                 .setSaveConsumer(
-                    newValue -> {
-                        RTConfig.INSTANCE.highlightClosest = newValue;
-
-                        RTConfig.trySave();
-                    }
+                    newValue -> RTConfig.INSTANCE.highlightClosest = newValue
                 )
                 .build()
         );
@@ -162,11 +150,7 @@ public class Keybindings {
                 .setDefaultValue(RTConfig.defaultCrossDimensionalWaypoints)
                 .setTooltip(new TranslatableText("tooltip.rtsurvival.crossDimensionalWaypoints"))
                 .setSaveConsumer(
-                    newValue -> {
-                        RTConfig.INSTANCE.crossDimensionalWaypoints = newValue;
-
-                        RTConfig.trySave();
-                    }
+                    newValue -> RTConfig.INSTANCE.crossDimensionalWaypoints = newValue
                 )
                 .build()
         );
@@ -176,11 +160,7 @@ public class Keybindings {
                 .setDefaultValue(RTConfig.defaultRenderScale)
                 .setTooltip(new TranslatableText("tooltip.rtsurvival.renderScale"))
                 .setSaveConsumer(
-                    (value) -> {
-                        RTConfig.INSTANCE.scale = value;
-
-                        RTConfig.trySave();
-                    }
+                    (value) -> RTConfig.INSTANCE.scale = value
                 )
                 .build()
         );
@@ -190,11 +170,7 @@ public class Keybindings {
                 .setDefaultValue(RTConfig.defaultPlateBackground.toInt() & 0x00FFFFFF)
                 .setTooltip(new TranslatableText("tooltip.rtsurvival.waypointColor"))
                 .setSaveConsumer2(
-                    (value) -> {
-                        RTConfig.INSTANCE.plateBackground.updateRGB(value);
-
-                        RTConfig.trySave();
-                    }
+                    (value) -> RTConfig.INSTANCE.plateBackground.updateRGB(value)
                 )
                 .build()
         );
@@ -204,11 +180,7 @@ public class Keybindings {
                 .setDefaultValue(RTConfig.defaultPlateBackground.a)
                 .setTooltip(new TranslatableText("tooltip.rtsurvival.waypointTransparency"))
                 .setSaveConsumer(
-                    (value) -> {
-                        RTConfig.INSTANCE.plateBackground.updateA(value);
-
-                        RTConfig.trySave();
-                    }
+                    (value) -> RTConfig.INSTANCE.plateBackground.updateA(value)
                 )
                 .build()
         );
@@ -218,11 +190,7 @@ public class Keybindings {
                 .setDefaultValue(RTConfig.defaultFullBackground.toInt() & 0x00FFFFFF)
                 .setTooltip(new TranslatableText("tooltip.rtsurvival.highlightWaypointColor"))
                 .setSaveConsumer2(
-                    (value) -> {
-                        RTConfig.INSTANCE.fullBackground.updateRGB(value);
-
-                        RTConfig.trySave();
-                    }
+                    (value) -> RTConfig.INSTANCE.fullBackground.updateRGB(value)
                 )
                 .build()
         );
@@ -232,11 +200,7 @@ public class Keybindings {
                 .setDefaultValue(RTConfig.defaultFullBackground.a)
                 .setTooltip(new TranslatableText("tooltip.rtsurvival.highlightWaypointTransparency"))
                 .setSaveConsumer(
-                    (value) -> {
-                        RTConfig.INSTANCE.fullBackground.updateA(value);
-
-                        RTConfig.trySave();
-                    }
+                    (value) -> RTConfig.INSTANCE.fullBackground.updateA(value)
                 )
                 .build()
         );
@@ -246,11 +210,7 @@ public class Keybindings {
                 .setDefaultValue(RTConfig.defaultDistanceBackground.toInt() & 0x00FFFFFF)
                 .setTooltip(new TranslatableText("tooltip.rtsurvival.distanceBackgroundColor"))
                 .setSaveConsumer2(
-                    (value) -> {
-                        RTConfig.INSTANCE.distanceBackground.updateRGB(value);
-
-                        RTConfig.trySave();
-                    }
+                    (value) -> RTConfig.INSTANCE.distanceBackground.updateRGB(value)
                 )
                 .build()
         );
@@ -260,11 +220,7 @@ public class Keybindings {
                 .setDefaultValue(RTConfig.defaultDistanceBackground.a)
                 .setTooltip(new TranslatableText("tooltip.rtsurvival.distanceBackgroundTransparency"))
                 .setSaveConsumer(
-                    (value) -> {
-                        RTConfig.INSTANCE.distanceBackground.updateA(value);
-
-                        RTConfig.trySave();
-                    }
+                    (value) -> RTConfig.INSTANCE.distanceBackground.updateA(value)
                 )
                 .build()
         );
