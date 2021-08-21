@@ -10,12 +10,12 @@
   ],
 
   "license": "CC0-1.0",
-  "icon": "assets/modid/icon.png",
+  "icon": "assets/rtsurvival/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "client": [
-      "phonis.survival.RTSurvival"
+      "dev.phonis.rtsurvival.RTSurvival"
     ]
   },
   "mixins": [
