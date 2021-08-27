@@ -31,7 +31,7 @@ public class SWStateManager {
         this.waypoints.addAll(waypoints);
     }
 
-    // only update a waypoint it existeds
+    // only update a waypoint it exists
     public synchronized void updateWaypoint(SWWaypoint waypoint) {
         if (this.removeWaypoint(waypoint.name)) this.waypoints.add(waypoint);
     }
