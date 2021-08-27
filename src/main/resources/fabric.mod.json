@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
-  "id": "rtsurvival",
+  "id": "sharedwaypoints-client-mod",
   "version": "${version}",
 
-  "name": "RTSurvival",
-  "description": "RTSurvival",
+  "name": "Shared Waypoints Client",
+  "description": "The client mod for SharedWaypoints",
   "authors": [
     "phonis"
   ],
@@ -15,11 +15,11 @@
   "environment": "*",
   "entrypoints": {
     "client": [
-      "dev.phonis.rtsurvival.RTSurvival"
+      "dev.phonis.sharedwaypoints.client.SharedWaypointsClient"
     ]
   },
   "mixins": [
-    "rtsurvival.mixins.json"
+    "sharedwaypoints-client-mod.json"
   ],
 
   "depends": {
