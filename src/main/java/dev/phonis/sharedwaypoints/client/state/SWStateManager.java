@@ -31,13 +31,13 @@ public class SWStateManager {
         this.waypoints.addAll(waypoints);
     }
 
+    // only update a waypoint it existeds
     public synchronized void updateWaypoint(SWWaypoint waypoint) {
-        this.removeWaypoint(waypoint.name);
-        this.waypoints.add(waypoint);
+        if (this.removeWaypoint(waypoint.name)) this.waypoints.add(waypoint);
     }
 
-    public synchronized void removeWaypoint(String waypointName) {
-        this.waypoints.removeIf(w -> w.name.equals(waypointName));
+    public synchronized boolean removeWaypoint(String waypointName) {
+        return this.waypoints.removeIf(w -> w.name.equals(waypointName));
     }
 
     public synchronized void clearHoveredWaypoint() {
