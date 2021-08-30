@@ -69,6 +69,7 @@ public class SWConfig implements Serializable {
 
         // Atomic file replace
         Path tempPath = path.resolveSibling(path.getFileName() + ".tmp");
+        
         Files.writeString(tempPath, GSON.toJson(this));
         Files.move(tempPath, path, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
     }
