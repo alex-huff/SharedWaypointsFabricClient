@@ -30,5 +30,6 @@
   "tooltip.sharedwaypoints.highlightWaypointTransparency": "Sets the transparency of the highlighted waypoint",
   "tooltip.sharedwaypoints.distanceBackgroundColor": "Sets the color of the distance background",
   "tooltip.sharedwaypoints.distanceBackgroundTransparency": "Sets the transparency of the distance background",
-  "tooltip.sharedwaypoints.waypoints.keybindings": "Contains the keybindings related to waypoints"
+  "tooltip.sharedwaypoints.waypoints.keybindings": "Contains the keybindings related to waypoints",
+  "modmenu.descriptionTranslation.modmenu": "Shared waypoints"
 }

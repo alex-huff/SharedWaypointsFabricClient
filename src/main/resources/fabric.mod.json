@@ -3,19 +3,22 @@
   "id": "sharedwaypoints-client-mod",
   "version": "${version}",
 
-  "name": "Shared Waypoints Client",
+  "name": "Shared Waypoints",
   "description": "The client mod for SharedWaypoints",
   "authors": [
     "phonis"
   ],
 
   "license": "CC0-1.0",
-  "icon": "assets/rtsurvival/icon.png",
+  "icon": "assets/rtsurvival/SW.png",
 
-  "environment": "*",
+  "environment": "client",
   "entrypoints": {
     "client": [
       "dev.phonis.sharedwaypoints.client.SharedWaypointsClient"
+    ],
+    "modmenu": [
+      "dev.phonis.sharedwaypoints.client.gui.SWModMenuApiImpl"
     ]
   },
   "mixins": [
@@ -29,5 +32,13 @@
     "fabric-key-binding-api-v1": "*",
     "cloth-config2": ">=5.0.38",
     "java": ">=16"
+  },
+
+  "custom": {
+    "modmenu": {
+      "links": {
+        "github": "https://github.com/alex-huff/SharedWaypointsFabricClient"
+      }
+    }
   }
 }

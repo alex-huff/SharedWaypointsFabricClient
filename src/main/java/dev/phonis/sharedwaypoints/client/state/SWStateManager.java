@@ -28,12 +28,14 @@ public class SWStateManager {
     }
 
     public synchronized void initializeWaypoints(List<SWWaypoint> waypoints) {
+        this.waypoints.clear();
         this.waypoints.addAll(waypoints);
     }
 
     // only update a waypoint it exists
     public synchronized void updateWaypoint(SWWaypoint waypoint) {
-        if (this.removeWaypoint(waypoint.name)) this.waypoints.add(waypoint);
+        this.removeWaypoint(waypoint.name);
+        this.waypoints.add(waypoint);
     }
 
     public synchronized boolean removeWaypoint(String waypointName) {
