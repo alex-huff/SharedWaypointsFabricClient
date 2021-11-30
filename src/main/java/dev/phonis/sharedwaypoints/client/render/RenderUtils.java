@@ -30,9 +30,9 @@ public class RenderUtils {
     // private static final RGBAColor distanceBackground = new RGBAColor(0x40000000);
 
     private static boolean compareDimension(SWDimension dimension, DimensionType currentDimension) {
-        return (dimension == SWDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.OVERWORLD_ID))
-            || (dimension == SWDimension.NETHER && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID))
-            || (dimension == SWDimension.END && currentDimension.getSkyProperties().equals(DimensionType.THE_END_ID));
+        return (dimension == SWDimension.OVERWORLD && currentDimension.getEffects().equals(DimensionType.OVERWORLD_ID))
+            || (dimension == SWDimension.NETHER && currentDimension.getEffects().equals(DimensionType.THE_NETHER_ID))
+            || (dimension == SWDimension.END && currentDimension.getEffects().equals(DimensionType.THE_END_ID));
     }
 
     public static void renderWaypoints(DimensionType currentDimension) {
@@ -48,11 +48,11 @@ public class RenderUtils {
 
                 SWWaypoint closest = waypointState.stream().filter(
                     waypoint -> (RenderUtils.compareDimension(waypoint.location.dimension, currentDimension)) ||
-                        (SWConfig.INSTANCE.crossDimensionalWaypoints && (waypoint.location.dimension == SWDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID)))
+                        (SWConfig.INSTANCE.crossDimensionalWaypoints && (waypoint.location.dimension == SWDimension.OVERWORLD && currentDimension.getEffects().equals(DimensionType.THE_NETHER_ID)))
                 ).min(
                     Comparator.comparingDouble(
                         waypoint -> {
-                            boolean adjusted = waypoint.location.dimension == SWDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID);
+                            boolean adjusted = waypoint.location.dimension == SWDimension.OVERWORLD && currentDimension.getEffects().equals(DimensionType.THE_NETHER_ID);
                             double dx = adjusted ? waypoint.location.x / 8d - cx : waypoint.location.x - cx;
                             double dy = adjusted ? 128d - cy : waypoint.location.y - cy;
                             double dz = adjusted ? waypoint.location.z / 8d - cz : waypoint.location.z - cz;
@@ -82,7 +82,7 @@ public class RenderUtils {
     private static void drawWaypoint(DimensionType currentDimension, SWWaypoint waypoint, boolean full) {
         if (RenderUtils.compareDimension(waypoint.location.dimension, currentDimension))
             RenderUtils.drawTextPlate(waypoint.name, waypoint.location.x, waypoint.location.y, waypoint.location.z, full);
-        else if (SWConfig.INSTANCE.crossDimensionalWaypoints && waypoint.location.dimension == SWDimension.OVERWORLD && currentDimension.getSkyProperties().equals(DimensionType.THE_NETHER_ID))
+        else if (SWConfig.INSTANCE.crossDimensionalWaypoints && waypoint.location.dimension == SWDimension.OVERWORLD && currentDimension.getEffects().equals(DimensionType.THE_NETHER_ID))
             RenderUtils.drawTextPlate(waypoint.name, waypoint.location.x / 8d, 128d, waypoint.location.z / 8d, full);
     }
 

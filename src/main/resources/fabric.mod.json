@@ -28,10 +28,10 @@
   "depends": {
     "fabricloader": ">=0.11.3",
     "fabric": "*",
-    "minecraft": "1.17.x",
+    "minecraft": "1.18.x",
     "fabric-key-binding-api-v1": "*",
     "cloth-config2": ">=5.0.38",
-    "java": ">=16"
+    "java": ">=17"
   },
 
   "custom": {
