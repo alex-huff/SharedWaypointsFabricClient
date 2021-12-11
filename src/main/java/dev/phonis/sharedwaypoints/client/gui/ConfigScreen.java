@@ -147,7 +147,7 @@ public class ConfigScreen {
 
         category.addEntry(
             subCategoryBuilder
-                .setExpanded(false)
+                .setExpanded(true)
                 .setTooltip(new TranslatableText("tooltip.sharedwaypoints.waypoints.keybindings"))
                 .build()
         );
