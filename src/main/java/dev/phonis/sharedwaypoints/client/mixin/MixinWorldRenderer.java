@@ -21,7 +21,10 @@ import dev.phonis.sharedwaypoints.client.config.SWConfig;
 @Mixin(WorldRenderer.class)
 public abstract class MixinWorldRenderer
 {
-    @Shadow @Final private MinecraftClient client;
+
+    @Shadow
+    @Final
+    private MinecraftClient client;
 
     @Inject(method = "render",
         at = @At(value = "INVOKE", ordinal = 1,
@@ -33,7 +36,8 @@ public abstract class MixinWorldRenderer
         GameRenderer gameRenderer,
         LightmapTextureManager lightmapTextureManager,
         Matrix4f projMatrix,
-        CallbackInfo ci)
+        CallbackInfo ci
+    )
     {
         this.onRenderWorldLast();
     }
@@ -52,18 +56,21 @@ public abstract class MixinWorldRenderer
         GameRenderer gameRenderer,
         LightmapTextureManager lightmapTextureManager,
         Matrix4f projMatrix,
-        CallbackInfo ci)
+        CallbackInfo ci
+    )
     {
         this.onRenderWorldLast();
     }
 
-    private void onRenderWorldLast() {
+    private void onRenderWorldLast()
+    {
         MinecraftClient mc = this.client;
 
         if (mc.world == null) return;
 
-        DimensionType currentDimension = mc.world.getDimension();
-        Framebuffer fb = MinecraftClient.isFabulousGraphicsOrBetter() ? mc.worldRenderer.getTranslucentFramebuffer() : null;
+        DimensionEffects.SkyType currentDimension = mc.world.getDimensionEffects().getSkyType();
+        Framebuffer              fb               = MinecraftClient.isFabulousGraphicsOrBetter()
+                                                    ? mc.worldRenderer.getTranslucentFramebuffer() : null;
 
         if (fb != null) fb.beginWrite(false);
 

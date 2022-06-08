@@ -6,40 +6,49 @@ import dev.phonis.sharedwaypoints.client.gui.ConfigScreen;
 import dev.phonis.sharedwaypoints.client.state.SWStateManager;
 import net.minecraft.client.MinecraftClient;
 
-public class Keybindings {
+public class Keybindings
+{
 
-    public static void handle(MinecraftClient client) {
+    public static void handle(MinecraftClient client)
+    {
         boolean needToUpdateConfig = false;
 
-        while (SharedWaypointsClient.openConfigScreenKeyBinding.wasPressed()) {
+        while (SharedWaypointsClient.openConfigScreenKeyBinding.wasPressed())
+        {
             client.setScreen(ConfigScreen.getConfigScreen(client.currentScreen));
         }
 
-        while (SharedWaypointsClient.toggleWaypointsKeyBinding.wasPressed()) {
+        while (SharedWaypointsClient.toggleWaypointsKeyBinding.wasPressed())
+        {
             SWConfig.INSTANCE.renderWaypoints = !SWConfig.INSTANCE.renderWaypoints;
-            needToUpdateConfig = true;
+            needToUpdateConfig                = true;
 
-            if (!SWConfig.INSTANCE.renderWaypoints) {
+            if (!SWConfig.INSTANCE.renderWaypoints)
+            {
                 SWStateManager.INSTANCE.clearHoveredWaypoint();
             }
         }
 
-        while (SharedWaypointsClient.toggleWaypointFullNamesKeyBinding.wasPressed()) {
+        while (SharedWaypointsClient.toggleWaypointFullNamesKeyBinding.wasPressed())
+        {
             SWConfig.INSTANCE.fullWaypointNames = !SWConfig.INSTANCE.fullWaypointNames;
-            needToUpdateConfig = true;
+            needToUpdateConfig                  = true;
         }
 
-        while (SharedWaypointsClient.toggleHighlightClosestKeyBinding.wasPressed()) {
+        while (SharedWaypointsClient.toggleHighlightClosestKeyBinding.wasPressed())
+        {
             SWConfig.INSTANCE.highlightClosest = !SWConfig.INSTANCE.highlightClosest;
-            needToUpdateConfig = true;
+            needToUpdateConfig                 = true;
         }
 
-        while (SharedWaypointsClient.toggleCrossDimensionalWaypointsKeyBinding.wasPressed()) {
+        while (SharedWaypointsClient.toggleCrossDimensionalWaypointsKeyBinding.wasPressed())
+        {
             SWConfig.INSTANCE.crossDimensionalWaypoints = !SWConfig.INSTANCE.crossDimensionalWaypoints;
-            needToUpdateConfig = true;
+            needToUpdateConfig                          = true;
         }
 
-        if (needToUpdateConfig) {
+        if (needToUpdateConfig)
+        {
             SWConfig.trySave();
         }
     }
