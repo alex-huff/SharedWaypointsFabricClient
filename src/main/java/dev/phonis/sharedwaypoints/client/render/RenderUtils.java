@@ -55,29 +55,28 @@ class RenderUtils
             double cz        = cameraPos.z;
 
             SWWaypoint closest = waypointState.stream().filter(
-                waypoint -> (RenderUtils.compareDimension(waypoint.location.dimension, currentDimension)) || (
-                    SWConfig.INSTANCE.crossDimensionalWaypoints && (
-                        waypoint.location.dimension == SWDimension.OVERWORLD &&
-                        currentDimension.equals(DimensionEffects.SkyType.NONE)
-                    )
-                )).min(Comparator.comparingDouble(waypoint ->
-            {
-                boolean adjusted = waypoint.location.dimension == SWDimension.OVERWORLD &&
-                                   currentDimension.equals(DimensionEffects.SkyType.NONE);
-                double dx                = adjusted ? waypoint.location.x / 8d - cx : waypoint.location.x - cx;
-                double dy                = adjusted ? 128d - cy : waypoint.location.y - cy;
-                double dz                = adjusted ? waypoint.location.z / 8d - cz : waypoint.location.z - cz;
-                Vec3d  waypointDirection = new Vec3d(dx, dy, dz).normalize();
-                double rotX              = camera.getYaw();
-                double rotY              = camera.getPitch();
-                double xz                = Math.cos(Math.toRadians(rotY));
-                double cxD               = -xz * Math.sin(Math.toRadians(rotX));
-                double cyD               = -Math.sin(Math.toRadians(rotY));
-                double czD               = xz * Math.cos(Math.toRadians(rotX));
-                Vec3d  cameraDirection   = new Vec3d(cxD, cyD, czD).normalize();
+                    waypoint -> (RenderUtils.compareDimension(waypoint.location.dimension, currentDimension)) ||
+                                (SWConfig.INSTANCE.crossDimensionalWaypoints &&
+                                 (waypoint.location.dimension == SWDimension.OVERWORLD &&
+                                  currentDimension.equals(DimensionEffects.SkyType.NONE))))
+                .min(Comparator.comparingDouble(waypoint ->
+                {
+                    boolean adjusted = waypoint.location.dimension == SWDimension.OVERWORLD &&
+                                       currentDimension.equals(DimensionEffects.SkyType.NONE);
+                    double dx = adjusted ? waypoint.location.x / 8d - cx : waypoint.location.x - cx;
+                    double dy = adjusted ? 128d - cy : waypoint.location.y - cy;
+                    double dz = adjusted ? waypoint.location.z / 8d - cz : waypoint.location.z - cz;
+                    Vec3d  waypointDirection = new Vec3d(dx, dy, dz).normalize();
+                    double rotX              = camera.getYaw();
+                    double rotY              = camera.getPitch();
+                    double xz                = Math.cos(Math.toRadians(rotY));
+                    double cxD               = -xz * Math.sin(Math.toRadians(rotX));
+                    double cyD               = -Math.sin(Math.toRadians(rotY));
+                    double czD               = xz * Math.cos(Math.toRadians(rotX));
+                    Vec3d  cameraDirection   = new Vec3d(cxD, cyD, czD).normalize();
 
-                return cameraDirection.distanceTo(waypointDirection);
-            })).orElse(null);
+                    return cameraDirection.distanceTo(waypointDirection);
+                })).orElse(null);
 
             if (closest == null)
             {
@@ -86,7 +85,7 @@ class RenderUtils
 
             SWStateManager.INSTANCE.setHoveredWaypoint(closest.name);
             waypointState.stream().filter(waypoint -> !closest.name.equals(waypoint.name))
-                         .forEach(waypoint -> RenderUtils.drawWaypoint(currentDimension, waypoint, false));
+                .forEach(waypoint -> RenderUtils.drawWaypoint(currentDimension, waypoint, false));
             RenderUtils.drawWaypoint(currentDimension, closest, SWConfig.INSTANCE.highlightClosest);
         });
     }
@@ -207,9 +206,9 @@ class RenderUtils
         buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
         buffer.vertex(-strLenHalf - 1, -1, 0.0D).color(background.r, background.g, background.b, background.a).next();
         buffer.vertex(-strLenHalf - 1, textHeight, 0.0D).color(background.r, background.g, background.b, background.a)
-              .next();
+            .next();
         buffer.vertex(strLenHalf, textHeight, 0.0D).color(background.r, background.g, background.b, background.a)
-              .next();
+            .next();
         buffer.vertex(strLenHalf, -1, 0.0D).color(background.r, background.g, background.b, background.a).next();
         tessellator.draw();
 
@@ -220,17 +219,17 @@ class RenderUtils
 
             buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR);
             buffer.vertex(-strLenHalf - 1, textRenderer.fontHeight - 1, 0.0D)
-                  .color(SWConfig.INSTANCE.distanceBackground.r, SWConfig.INSTANCE.distanceBackground.g,
-                      SWConfig.INSTANCE.distanceBackground.b, SWConfig.INSTANCE.distanceBackground.a).next();
+                .color(SWConfig.INSTANCE.distanceBackground.r, SWConfig.INSTANCE.distanceBackground.g,
+                    SWConfig.INSTANCE.distanceBackground.b, SWConfig.INSTANCE.distanceBackground.a).next();
             buffer.vertex(-strLenHalf - 1, textHeight + textRenderer.fontHeight, 0.0D)
-                  .color(SWConfig.INSTANCE.distanceBackground.r, SWConfig.INSTANCE.distanceBackground.g,
-                      SWConfig.INSTANCE.distanceBackground.b, SWConfig.INSTANCE.distanceBackground.a).next();
+                .color(SWConfig.INSTANCE.distanceBackground.r, SWConfig.INSTANCE.distanceBackground.g,
+                    SWConfig.INSTANCE.distanceBackground.b, SWConfig.INSTANCE.distanceBackground.a).next();
             buffer.vertex(strLenHalf, textHeight + textRenderer.fontHeight, 0.0D)
-                  .color(SWConfig.INSTANCE.distanceBackground.r, SWConfig.INSTANCE.distanceBackground.g,
-                      SWConfig.INSTANCE.distanceBackground.b, SWConfig.INSTANCE.distanceBackground.a).next();
+                .color(SWConfig.INSTANCE.distanceBackground.r, SWConfig.INSTANCE.distanceBackground.g,
+                    SWConfig.INSTANCE.distanceBackground.b, SWConfig.INSTANCE.distanceBackground.a).next();
             buffer.vertex(strLenHalf, textRenderer.fontHeight - 1, 0.0D)
-                  .color(SWConfig.INSTANCE.distanceBackground.r, SWConfig.INSTANCE.distanceBackground.g,
-                      SWConfig.INSTANCE.distanceBackground.b, SWConfig.INSTANCE.distanceBackground.a).next();
+                .color(SWConfig.INSTANCE.distanceBackground.r, SWConfig.INSTANCE.distanceBackground.g,
+                    SWConfig.INSTANCE.distanceBackground.b, SWConfig.INSTANCE.distanceBackground.a).next();
             tessellator.draw();
         }
 

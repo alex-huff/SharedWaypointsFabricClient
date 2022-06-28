@@ -85,82 +85,72 @@ class ConfigScreen
     Screen getConfigScreen(Screen parent)
     {
         ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent)
-                                             // .setTransparentBackground(true)
-                                             .setTitle(MutableText.of(ConfigScreen.configTitle));
+            // .setTransparentBackground(true)
+            .setTitle(MutableText.of(ConfigScreen.configTitle));
 
         builder.setSavingRunnable(SWConfig::trySave);
 
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
         ConfigCategory category = builder.getOrCreateCategory(MutableText.of(ConfigScreen.waypointCategoryName));
 
-        category.addEntry(entryBuilder
-            .startBooleanToggle(MutableText.of(ConfigScreen.toggleWaypointsOption), SWConfig.INSTANCE.renderWaypoints)
-            .setDefaultValue(SWConfig.defaultRenderWaypoints)
+        category.addEntry(entryBuilder.startBooleanToggle(MutableText.of(ConfigScreen.toggleWaypointsOption),
+                SWConfig.INSTANCE.renderWaypoints).setDefaultValue(SWConfig.defaultRenderWaypoints)
             .setTooltip(MutableText.of(ConfigScreen.toggleWaypointsTooltip))
             .setSaveConsumer(newValue -> SWConfig.INSTANCE.renderWaypoints = newValue).build());
 
         category.addEntry(entryBuilder.startBooleanToggle(MutableText.of(ConfigScreen.fullWaypointNamesOption),
-                                          SWConfig.INSTANCE.fullWaypointNames).setDefaultValue(SWConfig.defaultFullWaypointNames)
-                                      .setTooltip(MutableText.of(ConfigScreen.fullWaypointNamesTooltip))
-                                      .setSaveConsumer(newValue -> SWConfig.INSTANCE.fullWaypointNames = newValue)
-                                      .build());
+                SWConfig.INSTANCE.fullWaypointNames).setDefaultValue(SWConfig.defaultFullWaypointNames)
+            .setTooltip(MutableText.of(ConfigScreen.fullWaypointNamesTooltip))
+            .setSaveConsumer(newValue -> SWConfig.INSTANCE.fullWaypointNames = newValue).build());
 
         category.addEntry(entryBuilder.startBooleanToggle(MutableText.of(ConfigScreen.highlightHoveredWaypointOption),
-                                          SWConfig.INSTANCE.highlightClosest).setDefaultValue(SWConfig.defaultHighlightClosest)
-                                      .setTooltip(MutableText.of(ConfigScreen.highlightHoveredWaypointTooltip))
-                                      .setSaveConsumer(newValue -> SWConfig.INSTANCE.highlightClosest = newValue)
-                                      .build());
+                SWConfig.INSTANCE.highlightClosest).setDefaultValue(SWConfig.defaultHighlightClosest)
+            .setTooltip(MutableText.of(ConfigScreen.highlightHoveredWaypointTooltip))
+            .setSaveConsumer(newValue -> SWConfig.INSTANCE.highlightClosest = newValue).build());
 
         category.addEntry(entryBuilder.startBooleanToggle(MutableText.of(ConfigScreen.crossDimensionalWaypointsOption),
-                                          SWConfig.INSTANCE.crossDimensionalWaypoints).setDefaultValue(SWConfig.defaultCrossDimensionalWaypoints)
-                                      .setTooltip(MutableText.of(ConfigScreen.crossDimensionalWaypointsTooltip))
-                                      .setSaveConsumer(
-                                          newValue -> SWConfig.INSTANCE.crossDimensionalWaypoints = newValue).build());
+                SWConfig.INSTANCE.crossDimensionalWaypoints).setDefaultValue(SWConfig.defaultCrossDimensionalWaypoints)
+            .setTooltip(MutableText.of(ConfigScreen.crossDimensionalWaypointsTooltip))
+            .setSaveConsumer(newValue -> SWConfig.INSTANCE.crossDimensionalWaypoints = newValue).build());
 
         category.addEntry(
             entryBuilder.startIntSlider(MutableText.of(ConfigScreen.renderScaleOption), SWConfig.INSTANCE.scale, 0, 100)
-                        .setDefaultValue(SWConfig.defaultRenderScale)
-                        .setTooltip(MutableText.of(ConfigScreen.renderScaleTooltip))
-                        .setSaveConsumer((value) -> SWConfig.INSTANCE.scale = value).build());
+                .setDefaultValue(SWConfig.defaultRenderScale)
+                .setTooltip(MutableText.of(ConfigScreen.renderScaleTooltip))
+                .setSaveConsumer((value) -> SWConfig.INSTANCE.scale = value).build());
 
         category.addEntry(entryBuilder.startColorField(MutableText.of(ConfigScreen.waypointColorOption),
-                                          SWConfig.INSTANCE.plateBackground.toSheDanielColor())
-                                      .setDefaultValue(SWConfig.defaultPlateBackground.toInt() & 0x00FFFFFF)
-                                      .setTooltip(MutableText.of(ConfigScreen.waypointColorTooltip))
-                                      .setSaveConsumer2((value) -> SWConfig.INSTANCE.plateBackground.updateRGB(value))
-                                      .build());
+                SWConfig.INSTANCE.plateBackground.toSheDanielColor())
+            .setDefaultValue(SWConfig.defaultPlateBackground.toInt() & 0x00FFFFFF)
+            .setTooltip(MutableText.of(ConfigScreen.waypointColorTooltip))
+            .setSaveConsumer2((value) -> SWConfig.INSTANCE.plateBackground.updateRGB(value)).build());
 
         category.addEntry(entryBuilder.startIntSlider(MutableText.of(ConfigScreen.waypointTransparencyOption),
-                                          SWConfig.INSTANCE.plateBackground.a, 0, 255).setDefaultValue(SWConfig.defaultPlateBackground.a)
-                                      .setTooltip(MutableText.of(ConfigScreen.waypointTransparencyTooltip))
-                                      .setSaveConsumer((value) -> SWConfig.INSTANCE.plateBackground.updateA(value))
-                                      .build());
+                SWConfig.INSTANCE.plateBackground.a, 0, 255).setDefaultValue(SWConfig.defaultPlateBackground.a)
+            .setTooltip(MutableText.of(ConfigScreen.waypointTransparencyTooltip))
+            .setSaveConsumer((value) -> SWConfig.INSTANCE.plateBackground.updateA(value)).build());
 
         category.addEntry(entryBuilder.startColorField(MutableText.of(ConfigScreen.highlightWaypointColorOption),
-                                          SWConfig.INSTANCE.fullBackground.toSheDanielColor())
-                                      .setDefaultValue(SWConfig.defaultFullBackground.toInt() & 0x00FFFFFF)
-                                      .setTooltip(MutableText.of(ConfigScreen.highlightWaypointColorTooltip))
-                                      .setSaveConsumer2((value) -> SWConfig.INSTANCE.fullBackground.updateRGB(value))
-                                      .build());
+                SWConfig.INSTANCE.fullBackground.toSheDanielColor())
+            .setDefaultValue(SWConfig.defaultFullBackground.toInt() & 0x00FFFFFF)
+            .setTooltip(MutableText.of(ConfigScreen.highlightWaypointColorTooltip))
+            .setSaveConsumer2((value) -> SWConfig.INSTANCE.fullBackground.updateRGB(value)).build());
 
         category.addEntry(entryBuilder.startIntSlider(MutableText.of(ConfigScreen.highlightWaypointTransparencyOption),
-                                          SWConfig.INSTANCE.fullBackground.a, 0, 255).setDefaultValue(SWConfig.defaultFullBackground.a)
-                                      .setTooltip(MutableText.of(ConfigScreen.highlightWaypointTransparencyTooltip))
-                                      .setSaveConsumer((value) -> SWConfig.INSTANCE.fullBackground.updateA(value))
-                                      .build());
+                SWConfig.INSTANCE.fullBackground.a, 0, 255).setDefaultValue(SWConfig.defaultFullBackground.a)
+            .setTooltip(MutableText.of(ConfigScreen.highlightWaypointTransparencyTooltip))
+            .setSaveConsumer((value) -> SWConfig.INSTANCE.fullBackground.updateA(value)).build());
 
         category.addEntry(entryBuilder.startColorField(MutableText.of(ConfigScreen.distanceBackgroundColorOption),
-                                          SWConfig.INSTANCE.distanceBackground.toSheDanielColor())
-                                      .setDefaultValue(SWConfig.defaultDistanceBackground.toInt() & 0x00FFFFFF)
-                                      .setTooltip(MutableText.of(ConfigScreen.distanceBackgroundColorTooltip))
-                                      .setSaveConsumer2(
-                                          (value) -> SWConfig.INSTANCE.distanceBackground.updateRGB(value)).build());
+                SWConfig.INSTANCE.distanceBackground.toSheDanielColor())
+            .setDefaultValue(SWConfig.defaultDistanceBackground.toInt() & 0x00FFFFFF)
+            .setTooltip(MutableText.of(ConfigScreen.distanceBackgroundColorTooltip))
+            .setSaveConsumer2((value) -> SWConfig.INSTANCE.distanceBackground.updateRGB(value)).build());
 
         category.addEntry(entryBuilder.startIntSlider(MutableText.of(ConfigScreen.distanceBackgroundTransparencyOption),
-                                          SWConfig.INSTANCE.distanceBackground.a, 0, 255).setDefaultValue(SWConfig.defaultDistanceBackground.a)
-                                      .setTooltip(MutableText.of(ConfigScreen.distanceBackgroundTransparencyTooltip))
-                                      .setSaveConsumer((value) -> SWConfig.INSTANCE.distanceBackground.updateA(value))
-                                      .build());
+                SWConfig.INSTANCE.distanceBackground.a, 0, 255).setDefaultValue(SWConfig.defaultDistanceBackground.a)
+            .setTooltip(MutableText.of(ConfigScreen.distanceBackgroundTransparencyTooltip))
+            .setSaveConsumer((value) -> SWConfig.INSTANCE.distanceBackground.updateA(value)).build());
 
         SubCategoryBuilder subCategoryBuilder = entryBuilder.startSubCategory(
             MutableText.of(ConfigScreen.waypointsKeybindingsCategoryName));
@@ -179,7 +169,7 @@ class ConfigScreen
 
         category.addEntry(
             subCategoryBuilder.setExpanded(true).setTooltip(MutableText.of(waypointKeybindingsCategoryTooltip))
-                              .build());
+                .build());
 
         return builder.build();
     }
@@ -202,9 +192,9 @@ class ConfigScreen
     KeyCodeEntry getKeybindingOption(ConfigEntryBuilder entryBuilder, KeyBinding keyBinding,
                                      TranslatableTextContent translationKey)
     {
-        return entryBuilder
-            .startKeyCodeField(MutableText.of(translationKey), KeyBindingHelper.getBoundKeyOf(keyBinding))
-            .setDefaultValue(keyBinding.getDefaultKey()).setSaveConsumer((code) ->
+        return entryBuilder.startKeyCodeField(MutableText.of(translationKey),
+                KeyBindingHelper.getBoundKeyOf(keyBinding)).setDefaultValue(keyBinding.getDefaultKey())
+            .setSaveConsumer((code) ->
             {
                 keyBinding.setBoundKey(code);
                 KeyBinding.updateKeysByCode();
