@@ -6,44 +6,49 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SWWaypointInitialize implements SWPacket
+public
+class SWWaypointInitialize implements SWPacket
 {
 
-    public final List<SWWaypoint> waypoints;
+	public final List<SWWaypoint> waypoints;
 
-    public SWWaypointInitialize(List<SWWaypoint> waypoints)
-    {
-        this.waypoints = waypoints;
-    }
+	public
+	SWWaypointInitialize(List<SWWaypoint> waypoints)
+	{
+		this.waypoints = waypoints;
+	}
 
-    @Override
-    public byte getID()
-    {
-        return Packets.In.SWWaypointInitializeID;
-    }
+	@Override
+	public
+	byte getID()
+	{
+		return Packets.In.SWWaypointInitializeID;
+	}
 
-    @Override
-    public void toBytes(DataOutputStream dos) throws IOException
-    {
-        dos.writeInt(this.waypoints.size());
+	@Override
+	public
+	void toBytes(DataOutputStream dos) throws IOException
+	{
+		dos.writeInt(this.waypoints.size());
 
-        for (SWWaypoint waypoint : this.waypoints)
-        {
-            waypoint.toBytes(dos);
-        }
-    }
+		for (SWWaypoint waypoint : this.waypoints)
+		{
+			waypoint.toBytes(dos);
+		}
+	}
 
-    public static SWWaypointInitialize fromBytes(DataInputStream dis) throws IOException
-    {
-        int              length    = dis.readInt();
-        List<SWWaypoint> waypoints = new ArrayList<>(length);
+	public static
+	SWWaypointInitialize fromBytes(DataInputStream dis) throws IOException
+	{
+		int              length    = dis.readInt();
+		List<SWWaypoint> waypoints = new ArrayList<>(length);
 
-        for (int i = 0; i < length; i++)
-        {
-            waypoints.add(SWWaypoint.fromBytes(dis));
-        }
+		for (int i = 0; i < length; i++)
+		{
+			waypoints.add(SWWaypoint.fromBytes(dis));
+		}
 
-        return new SWWaypointInitialize(waypoints);
-    }
+		return new SWWaypointInitialize(waypoints);
+	}
 
 }

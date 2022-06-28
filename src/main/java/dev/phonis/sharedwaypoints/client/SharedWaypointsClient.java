@@ -24,126 +24,99 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class SharedWaypointsClient implements ClientModInitializer
+public
+class SharedWaypointsClient implements ClientModInitializer
 {
 
-    public static final  int        protocolVersion                           = 1;
-    public static final  String     configDirectory                           = "config/SharedWaypoints/";
-    public static final  Identifier sWIdentifier                              = new Identifier("sharedwaypoints:main");
-    private static final String     category
-                                                                              = "category.sharedwaypoints.sharedWaypoints";
-    public static final  KeyBinding openConfigScreenKeyBinding                = KeyBindingHelper.registerKeyBinding(
-        new KeyBinding(
-            "binding.sharedwaypoints.sWMenu",
-            InputUtil.Type.KEYSYM,
-            GLFW.GLFW_KEY_G,
-            SharedWaypointsClient.category
-        )
-    );
-    public static final  KeyBinding toggleWaypointsKeyBinding                 = KeyBindingHelper.registerKeyBinding(
-        new KeyBinding(
-            "binding.sharedwaypoints.toggleWaypoints",
-            InputUtil.Type.KEYSYM,
-            GLFW.GLFW_KEY_N,
-            SharedWaypointsClient.category
-        )
-    );
-    public static final  KeyBinding toggleWaypointFullNamesKeyBinding         = KeyBindingHelper.registerKeyBinding(
-        new KeyBinding(
-            "binding.sharedwaypoints.toggleFullNames",
-            InputUtil.Type.KEYSYM,
-            GLFW.GLFW_KEY_UNKNOWN,
-            SharedWaypointsClient.category
-        )
-    );
-    public static final  KeyBinding toggleHighlightClosestKeyBinding          = KeyBindingHelper.registerKeyBinding(
-        new KeyBinding(
-            "binding.sharedwaypoints.toggleClosestHighlight",
-            InputUtil.Type.KEYSYM,
-            GLFW.GLFW_KEY_UNKNOWN,
-            SharedWaypointsClient.category
-        )
-    );
-    public static final  KeyBinding toggleCrossDimensionalWaypointsKeyBinding = KeyBindingHelper.registerKeyBinding(
-        new KeyBinding(
-            "binding.sharedwaypoints.toggleCrossDimensional",
-            InputUtil.Type.KEYSYM,
-            GLFW.GLFW_KEY_UNKNOWN,
-            SharedWaypointsClient.category
-        )
-    );
+	public static final  int        protocolVersion                           = 1;
+	public static final  String     configDirectory                           = "config/SharedWaypoints/";
+	public static final  Identifier sWIdentifier                              = new Identifier("sharedwaypoints:main");
+	private static final String     category
+																			  = "category.sharedwaypoints.sharedWaypoints";
+	public static final  KeyBinding openConfigScreenKeyBinding                = KeyBindingHelper.registerKeyBinding(
+		new KeyBinding("binding.sharedwaypoints.sWMenu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G,
+			SharedWaypointsClient.category));
+	public static final  KeyBinding toggleWaypointsKeyBinding                 = KeyBindingHelper.registerKeyBinding(
+		new KeyBinding("binding.sharedwaypoints.toggleWaypoints", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_N,
+			SharedWaypointsClient.category));
+	public static final  KeyBinding toggleWaypointFullNamesKeyBinding         = KeyBindingHelper.registerKeyBinding(
+		new KeyBinding("binding.sharedwaypoints.toggleFullNames", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN,
+			SharedWaypointsClient.category));
+	public static final  KeyBinding toggleHighlightClosestKeyBinding          = KeyBindingHelper.registerKeyBinding(
+		new KeyBinding("binding.sharedwaypoints.toggleClosestHighlight", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN,
+			SharedWaypointsClient.category));
+	public static final  KeyBinding toggleCrossDimensionalWaypointsKeyBinding = KeyBindingHelper.registerKeyBinding(
+		new KeyBinding("binding.sharedwaypoints.toggleCrossDimensional", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN,
+			SharedWaypointsClient.category));
 
-    @Override
-    public void onInitializeClient()
-    {
-        ClientPlayNetworking.registerGlobalReceiver(sWIdentifier, SWSurvivalReceiver.INSTANCE);
-        C2SPlayChannelEvents.REGISTER.register(
-            (clientPlayNetworkHandler, packetSender, minecraftClient, ids) ->
+	@Override
+	public
+	void onInitializeClient()
+	{
+		ClientPlayNetworking.registerGlobalReceiver(sWIdentifier, SWSurvivalReceiver.INSTANCE);
+		C2SPlayChannelEvents.REGISTER.register((clientPlayNetworkHandler, packetSender, minecraftClient, ids) ->
+		{
+			for (Identifier id : ids)
+			{
+				if (id.equals(SharedWaypointsClient.sWIdentifier))
+				{
+					try
+					{
+						if (Thread.currentThread().getName().equals("Render thread"))
+						{
+							clientPlayNetworkHandler.sendPacket(ClientPlayNetworking.createC2SPacket(sWIdentifier,
+								SharedWaypointsClient.packetToByteBuf(
+									new SWRegister(SharedWaypointsClient.protocolVersion))));
+						}
+					}
+					catch (IOException e)
+					{
+						e.printStackTrace();
+					}
+
+					break;
+				}
+			}
+		});
+		ClientPlayConnectionEvents.DISCONNECT.register(
+			(clientPlayNetworkHandler, minecraftClient) -> SWStateManager.INSTANCE.clearState());
+		ClientTickEvents.END_CLIENT_TICK.register(Keybindings::handle);
+	}
+
+	public static
+	void sendPacket(SWPacket packet)
+	{
+		try
+		{
+			ClientPlayNetworkHandler handler = MinecraftClient.getInstance().getNetworkHandler();
+
+            if (handler == null)
             {
-                for (Identifier id : ids)
-                {
-                    if (id.equals(SharedWaypointsClient.sWIdentifier))
-                    {
-                        try
-                        {
-                            if (Thread.currentThread().getName().equals("Render thread"))
-                            {
-                                clientPlayNetworkHandler.sendPacket(
-                                    ClientPlayNetworking.createC2SPacket(
-                                        sWIdentifier,
-                                        SharedWaypointsClient.packetToByteBuf(
-                                            new SWRegister(SharedWaypointsClient.protocolVersion))
-                                    )
-                                );
-                            }
-                        }
-                        catch (IOException e)
-                        {
-                            e.printStackTrace();
-                        }
-
-                        break;
-                    }
-                }
+                return;
             }
-        );
-        ClientPlayConnectionEvents.DISCONNECT.register(
-            (clientPlayNetworkHandler, minecraftClient) -> SWStateManager.INSTANCE.clearState()
-        );
-        ClientTickEvents.END_CLIENT_TICK.register(
-            Keybindings::handle
-        );
-    }
 
-    public static void sendPacket(SWPacket packet)
-    {
-        try
-        {
-            ClientPlayNetworkHandler handler = MinecraftClient.getInstance().getNetworkHandler();
+			handler.sendPacket(
+				ClientPlayNetworking.createC2SPacket(sWIdentifier, SharedWaypointsClient.packetToByteBuf(packet)));
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
+	}
 
-            if (handler == null) return;
+	private static
+	PacketByteBuf packetToByteBuf(SWPacket packet) throws IOException
+	{
+		ByteArrayOutputStream baos         = new ByteArrayOutputStream();
+		DataOutputStream      das          = new DataOutputStream(baos);
+		PacketByteBuf         packetBuffer = PacketByteBufs.create();
 
-            handler.sendPacket(
-                ClientPlayNetworking.createC2SPacket(sWIdentifier, SharedWaypointsClient.packetToByteBuf(packet)));
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
+		das.writeByte(packet.getID());
+		packet.toBytes(das);
+		das.close();
+		packetBuffer.writeBytes(baos.toByteArray());
 
-    private static PacketByteBuf packetToByteBuf(SWPacket packet) throws IOException
-    {
-        ByteArrayOutputStream baos         = new ByteArrayOutputStream();
-        DataOutputStream      das          = new DataOutputStream(baos);
-        PacketByteBuf         packetBuffer = PacketByteBufs.create();
-
-        das.writeByte(packet.getID());
-        packet.toBytes(das);
-        das.close();
-        packetBuffer.writeBytes(baos.toByteArray());
-
-        return packetBuffer;
-    }
+		return packetBuffer;
+	}
 
 }
