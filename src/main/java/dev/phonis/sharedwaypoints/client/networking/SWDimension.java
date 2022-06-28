@@ -7,12 +7,12 @@ public
 enum SWDimension
 {
 
-	OVERWORLD, NETHER, END, OTHER;
+    OVERWORLD, NETHER, END, OTHER;
 
-	public static
-	SWDimension fromBytes(DataInputStream dis) throws IOException
-	{
-		return SWDimension.values()[dis.readByte()];
-	}
+    public static
+    SWDimension fromBytes(DataInputStream dis) throws IOException
+    {
+        return SWDimension.values()[dis.readByte()];
+    }
 
 }

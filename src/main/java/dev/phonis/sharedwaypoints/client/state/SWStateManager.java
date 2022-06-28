@@ -10,68 +10,68 @@ public
 class SWStateManager
 {
 
-	public static final SWStateManager INSTANCE = new SWStateManager();
+    public static final SWStateManager INSTANCE = new SWStateManager();
 
-	private       String           hoveredWaypoint;
-	private final List<SWWaypoint> waypoints;
+    private       String           hoveredWaypoint;
+    private final List<SWWaypoint> waypoints;
 
-	private
-	SWStateManager()
-	{
-		this.waypoints = new ArrayList<>();
-	}
+    private
+    SWStateManager()
+    {
+        this.waypoints = new ArrayList<>();
+    }
 
-	public synchronized
-	void withWaypoints(Consumer<List<SWWaypoint>> consumer)
-	{
-		consumer.accept(this.waypoints);
-	}
+    public synchronized
+    void withWaypoints(Consumer<List<SWWaypoint>> consumer)
+    {
+        consumer.accept(this.waypoints);
+    }
 
-	public synchronized
-	void clearState()
-	{
-		this.hoveredWaypoint = null;
+    public synchronized
+    void clearState()
+    {
+        this.hoveredWaypoint = null;
 
-		this.waypoints.clear();
-	}
+        this.waypoints.clear();
+    }
 
-	public synchronized
-	void initializeWaypoints(List<SWWaypoint> waypoints)
-	{
-		this.waypoints.clear();
-		this.waypoints.addAll(waypoints);
-	}
+    public synchronized
+    void initializeWaypoints(List<SWWaypoint> waypoints)
+    {
+        this.waypoints.clear();
+        this.waypoints.addAll(waypoints);
+    }
 
-	// only update a waypoint it exists
-	public synchronized
-	void updateWaypoint(SWWaypoint waypoint)
-	{
-		this.removeWaypoint(waypoint.name);
-		this.waypoints.add(waypoint);
-	}
+    // only update a waypoint it exists
+    public synchronized
+    void updateWaypoint(SWWaypoint waypoint)
+    {
+        this.removeWaypoint(waypoint.name);
+        this.waypoints.add(waypoint);
+    }
 
-	public synchronized
-	boolean removeWaypoint(String waypointName)
-	{
-		return this.waypoints.removeIf(w -> w.name.equals(waypointName));
-	}
+    public synchronized
+    boolean removeWaypoint(String waypointName)
+    {
+        return this.waypoints.removeIf(w -> w.name.equals(waypointName));
+    }
 
-	public synchronized
-	void clearHoveredWaypoint()
-	{
-		this.hoveredWaypoint = null;
-	}
+    public synchronized
+    void clearHoveredWaypoint()
+    {
+        this.hoveredWaypoint = null;
+    }
 
-	public synchronized
-	String getHoveredWaypoint()
-	{
-		return this.hoveredWaypoint;
-	}
+    public synchronized
+    String getHoveredWaypoint()
+    {
+        return this.hoveredWaypoint;
+    }
 
-	public synchronized
-	void setHoveredWaypoint(String hoveredWaypoint)
-	{
-		this.hoveredWaypoint = hoveredWaypoint;
-	}
+    public synchronized
+    void setHoveredWaypoint(String hoveredWaypoint)
+    {
+        this.hoveredWaypoint = hoveredWaypoint;
+    }
 
 }

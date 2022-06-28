@@ -7,6 +7,6 @@ public
 interface SWSerializable
 {
 
-	void toBytes(DataOutputStream dos) throws IOException;
+    void toBytes(DataOutputStream dos) throws IOException;
 
 }
