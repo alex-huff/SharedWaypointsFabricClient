@@ -193,15 +193,13 @@ class RenderUtils
             return;
         }
 
-        String    adjustedText = (full || SWConfig.INSTANCE.fullWaypointNames) ? text
-                                                                               : text.substring(0, 1).toUpperCase();
-        String    distanceStr  = (int) distance + "m";
-        String[]  fullText     = full ? new String[]{ adjustedText, (int) distance + "m" }
-                                      : new String[]{ adjustedText };
-        int       lineLen      = textRenderer.getWidth(adjustedText);
-        int       strLenHalf   = lineLen / 2;
-        int       textHeight   = textRenderer.fontHeight - 1;
-        RGBAColor background   = full ? SWConfig.INSTANCE.fullBackground : SWConfig.INSTANCE.plateBackground;
+        String adjustedText = (full || SWConfig.INSTANCE.fullWaypointNames) ? text : text.substring(0, 1).toUpperCase();
+        String distanceStr = (int) distance + "m";
+        String[] fullText = full ? new String[]{ adjustedText, (int) distance + "m" } : new String[]{ adjustedText };
+        int       lineLen    = textRenderer.getWidth(adjustedText);
+        int       strLenHalf = lineLen / 2;
+        int       textHeight = textRenderer.fontHeight - 1;
+        RGBAColor background = full ? SWConfig.INSTANCE.fullBackground : SWConfig.INSTANCE.plateBackground;
 
         RenderSystem.depthMask(false);
         RenderSystem.disableDepthTest();

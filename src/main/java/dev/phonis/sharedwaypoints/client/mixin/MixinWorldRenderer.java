@@ -26,12 +26,8 @@ class MixinWorldRenderer
     @Final
     private MinecraftClient client;
 
-    @Inject(
-        method = "render", at = @At(
-        value = "INVOKE", ordinal = 1,
-        target = "Lnet/minecraft/client/render/WorldRenderer;renderWeather(Lnet/minecraft/client/render/LightmapTextureManager;FDDD)V"
-    )
-    )
+    @Inject(method = "render", at = @At(value = "INVOKE", ordinal = 1,
+                                        target = "Lnet/minecraft/client/render/WorldRenderer;renderWeather(Lnet/minecraft/client/render/LightmapTextureManager;FDDD)V"))
     private
     void onRenderWorldLastNormal(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline,
                                  Camera camera, GameRenderer gameRenderer,
@@ -40,19 +36,12 @@ class MixinWorldRenderer
         this.onRenderWorldLast();
     }
 
-    @Inject(
-        method = "render", slice = @Slice(
-        from = @At(
-            value = "FIELD", ordinal = 1, // start from the endDrawing() call
-            target = "Lnet/minecraft/client/render/RenderPhase;WEATHER_TARGET:Lnet/minecraft/client/render/RenderPhase$Target;"
-        ), to = @At(
-        value = "INVOKE", ordinal = 1, // end at the second renderWeather call
-        target = "Lnet/minecraft/client/render/WorldRenderer;renderWeather(Lnet/minecraft/client/render/LightmapTextureManager;FDDD)V"
-    )
-    ), at = @At(
-        value = "INVOKE", target = "Lnet/minecraft/client/gl/ShaderEffect;render(F)V"
-    )
-    )
+    @Inject(method = "render",
+            slice = @Slice(from = @At(value = "FIELD", ordinal = 1, // start from the endDrawing() call
+                                      target = "Lnet/minecraft/client/render/RenderPhase;WEATHER_TARGET:Lnet/minecraft/client/render/RenderPhase$Target;"),
+                           to = @At(value = "INVOKE", ordinal = 1, // end at the second renderWeather call
+                                    target = "Lnet/minecraft/client/render/WorldRenderer;renderWeather(Lnet/minecraft/client/render/LightmapTextureManager;FDDD)V")),
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gl/ShaderEffect;render(F)V"))
     private
     void onRenderWorldLastFabulous(MatrixStack matrices, float tickDelta, long limitTime, boolean renderBlockOutline,
                                    Camera camera, GameRenderer gameRenderer,
