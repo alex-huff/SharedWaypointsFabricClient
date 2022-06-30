@@ -3,15 +3,14 @@
   "minVersion": "0.8",
   "package": "dev.phonis.sharedwaypoints.client.mixin",
   "compatibilityLevel": "JAVA_17",
-  "mixins":
-  [
-  ],
+  "mixins": [],
   "client":
   [
-    "MixinWorldRenderer"
+    "MixinGameRenderer",
+    "MixinHudRender",
+    "math.MixinMatrix4f"
   ],
-  "injectors":
-  {
+  "injectors": {
     "defaultRequire": 1
   }
 }

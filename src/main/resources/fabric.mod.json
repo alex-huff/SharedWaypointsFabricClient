@@ -27,7 +27,7 @@
   },
   "mixins":
   [
-    "sharedwaypoints-client-mod.json"
+    "sharedwaypoints-client.mixins.json"
   ],
 
   "depends":

@@ -4,6 +4,7 @@ import dev.phonis.sharedwaypoints.client.keybindings.Keybindings;
 import dev.phonis.sharedwaypoints.client.networking.SWPacket;
 import dev.phonis.sharedwaypoints.client.networking.SWRegister;
 import dev.phonis.sharedwaypoints.client.networking.SWSurvivalReceiver;
+import dev.phonis.sharedwaypoints.client.render.WaypointRenderer;
 import dev.phonis.sharedwaypoints.client.state.SWStateManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -84,18 +85,7 @@ class SharedWaypointsClient implements ClientModInitializer
         ClientPlayConnectionEvents.DISCONNECT.register(
             (clientPlayNetworkHandler, minecraftClient) -> SWStateManager.INSTANCE.clearState());
         ClientTickEvents.END_CLIENT_TICK.register(Keybindings::handle);
-        HudRenderCallback.EVENT.register(this::testHudRender);
-    }
-
-    private
-    void testHudRender(MatrixStack matrixStack, float tickDelta)
-    {
-        MinecraftClient minecraftClient = MinecraftClient.getInstance();
-        Matrix4f cameraToWorld = minecraftClient.gameRenderer.getBasicProjectionMatrix(
-            minecraftClient.options.getFov().getValue());
-        Matrix4f worldToCamera = cameraToWorld.copy();
-        worldToCamera.invert();
-
+        HudRenderCallback.EVENT.register((a, b) -> System.out.println(System.currentTimeMillis()));
     }
 
     public static
