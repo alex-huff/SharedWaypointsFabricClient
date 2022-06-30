@@ -15,6 +15,22 @@ class RenderUtils
 {
 
     public static
+    void setupRender()
+    {
+        RenderSystem.disableCull();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
+    }
+
+    public static
+    void endRender()
+    {
+        RenderSystem.enableCull();
+        RenderSystem.disableBlend();
+    }
+
+    public static
     boolean coordinateOnScreen(Vec3d position)
     {
         return position != null && position.z > 0;
@@ -87,9 +103,11 @@ class RenderUtils
         float    r              = (float) (color >> 16 & 255) / 255.0F;
         float    g              = (float) (color >> 8 & 255) / 255.0F;
         float    b              = (float) (color & 255) / 255.0F;
+        RenderUtils.setupRender();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
         RenderUtils.renderRoundedBox(positionMatrix, r, g, b, a, xStart, yStart, xEnd, yEnd, radiusCorner1,
             radiusCorner2, radiusCorner3, radiusCorner4, samples);
+        RenderUtils.endRender();
     }
 
     public static
