@@ -33,6 +33,15 @@ class WaypointRenderer
 
     public static final List<Runnable> hudRenderTasks = new ArrayList<>();
 
+    private static
+    boolean shouldRender(SWWaypoint swWaypoint, DimensionEffects.SkyType currentDimension)
+    {
+        return (WaypointRenderer.compareDimension(swWaypoint.location.dimension, currentDimension)) ||
+               (SWConfig.INSTANCE.crossDimensionalWaypoints &&
+                (swWaypoint.location.dimension == SWDimension.OVERWORLD &&
+                 currentDimension.equals(DimensionEffects.SkyType.NONE)));
+    }
+
     public static
     void renderWaypoints(MatrixStack matrixStack, DimensionEffects.SkyType currentDimension)
     {
@@ -41,16 +50,14 @@ class WaypointRenderer
         int                                          screenHeight    = minecraftClient.getWindow().getScaledHeight();
         Vec2f                                        screenMiddle    = new Vec2f(screenWidth / 2F, screenHeight / 2F);
         final List<WaypointRenderer.RenderContext2D> toRender        = new ArrayList<>();
-        SWStateManager.INSTANCE.withWaypoints((waypointState) -> waypointState.stream().sequential().filter(
-                waypoint -> (WaypointRenderer.compareDimension(waypoint.location.dimension, currentDimension)) ||
-                            (SWConfig.INSTANCE.crossDimensionalWaypoints &&
-                             (waypoint.location.dimension == SWDimension.OVERWORLD &&
-                              currentDimension.equals(DimensionEffects.SkyType.NONE)))).map(swWaypoint ->
+        SWStateManager.INSTANCE.withWaypoints((waypointState) -> waypointState.stream().sequential()
+            .filter(waypoint -> WaypointRenderer.shouldRender(waypoint, currentDimension)).map(swWaypoint ->
             {
                 boolean adjusted = swWaypoint.location.dimension == SWDimension.OVERWORLD &&
                                    currentDimension.equals(DimensionEffects.SkyType.NONE);
                 Vec3d adjustedLocation = new Vec3d(adjusted ? swWaypoint.location.x / 8d : swWaypoint.location.x,
-                    adjusted ? 128d : swWaypoint.location.y, adjusted ? swWaypoint.location.z / 8d : swWaypoint.location.z);
+                    adjusted ? 128d : swWaypoint.location.y,
+                    adjusted ? swWaypoint.location.z / 8d : swWaypoint.location.z);
                 Vec3d pixelCoordinates = RenderUtils.worldSpaceToScreenSpace(
                     new Vec3d(adjustedLocation.x, adjustedLocation.y, adjustedLocation.z), matrixStack);
                 return new WaypointRenderer.RenderContext3D(adjustedLocation, pixelCoordinates, swWaypoint);
@@ -96,6 +103,7 @@ class WaypointRenderer
         float     waypointTextWidth  = textRenderer.getWidth(waypointLabel) - 1;
         float     waypointTextHeight = textRenderer.fontHeight - 1;
         float     padding            = waypointTextHeight * .2F;
+        RGBAColor textColor          = SWConfig.INSTANCE.textColor;
         RGBAColor waypointColor      = highlighted ? SWConfig.INSTANCE.fullBackground
                                                    : SWConfig.INSTANCE.plateBackground;
         matrixStack.push();
@@ -104,11 +112,12 @@ class WaypointRenderer
         RenderUtils.renderRoundedBox(matrixStack, waypointColor, -waypointTextWidth / 2F - padding,
             -waypointTextHeight / 2F - padding, waypointTextWidth / 2F + padding, waypointTextHeight / 2F + padding, 3,
             25);
-        textRenderer.draw(matrixStack, waypointLabel, -waypointTextWidth / 2F, -waypointTextHeight / 2F, 0xFFFFFFFF);
+        textRenderer.draw(matrixStack, waypointLabel, -waypointTextWidth / 2F, -waypointTextHeight / 2F,
+            textColor.toInt());
         if (highlighted)
         {
             matrixStack.translate(0, waypointTextHeight + padding * 2, 0);
-            String    distanceLabel        = toRender.distance() + "m";
+            String    distanceLabel      = toRender.distance() + "m";
             float     distanceTextWidth  = textRenderer.getWidth(distanceLabel) - 1;
             float     distanceTextHeight = textRenderer.fontHeight - 1;
             RGBAColor distanceColor      = SWConfig.INSTANCE.distanceBackground;
@@ -116,7 +125,7 @@ class WaypointRenderer
                 -distanceTextHeight / 2F - padding, distanceTextWidth / 2F + padding, distanceTextHeight / 2F + padding,
                 3, 25);
             textRenderer.draw(matrixStack, distanceLabel, -distanceTextWidth / 2F, -distanceTextHeight / 2F,
-                0xFFFFFFFF);
+                textColor.toInt());
         }
         matrixStack.pop();
     }

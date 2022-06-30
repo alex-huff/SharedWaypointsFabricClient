@@ -19,6 +19,7 @@
   "option.sharedwaypoints.highlightWaypointTransparency": "Highlighted Waypoint Transparency",
   "option.sharedwaypoints.distanceBackgroundColor": "Distance Background Color",
   "option.sharedwaypoints.distanceBackgroundTransparency": "Distance Background Transparency",
+  "option.sharedwaypoints.textColor": "Text Color",
   "tooltip.sharedwaypoints.toggleWaypoints": "Toggles waypoint visibility",
   "tooltip.sharedwaypoints.renderScale": "Sets the scale used for rendering waypoints",
   "tooltip.sharedwaypoints.fullWaypointNames": "Toggles whether waypoint names are concise or full",
@@ -30,6 +31,7 @@
   "tooltip.sharedwaypoints.highlightWaypointTransparency": "Sets the transparency of the highlighted waypoint",
   "tooltip.sharedwaypoints.distanceBackgroundColor": "Sets the color of the distance background",
   "tooltip.sharedwaypoints.distanceBackgroundTransparency": "Sets the transparency of the distance background",
+  "tooltip.sharedwaypoints.textColor": "Sets the color of the text",
   "tooltip.sharedwaypoints.waypoints.keybindings": "Contains the keybindings related to waypoints",
   "modmenu.descriptionTranslation.modmenu": "Shared waypoints"
 }

@@ -28,6 +28,7 @@ class SWConfig implements Serializable
     public static final  RGBAColor defaultPlateBackground           = new RGBAColor(50, 50, 120, 160);
     public static final  RGBAColor defaultFullBackground            = new RGBAColor(120, 50, 50, 200);
     public static final  RGBAColor defaultDistanceBackground        = new RGBAColor(50, 50, 50, 255);
+    public static final  RGBAColor defaultTextColor                 = new RGBAColor(255, 255, 255, 255);
     public static final  SWConfig  INSTANCE                         = SWConfig.load();
 
     public boolean   crossDimensionalWaypoints;
@@ -38,6 +39,7 @@ class SWConfig implements Serializable
     public RGBAColor plateBackground;
     public RGBAColor fullBackground;
     public RGBAColor distanceBackground;
+    public RGBAColor textColor;
 
     public
     SWConfig()
@@ -50,6 +52,7 @@ class SWConfig implements Serializable
         this.plateBackground           = SWConfig.defaultPlateBackground;
         this.fullBackground            = SWConfig.defaultFullBackground;
         this.distanceBackground        = SWConfig.defaultDistanceBackground;
+        this.textColor                 = SWConfig.defaultTextColor;
     }
 
     private static

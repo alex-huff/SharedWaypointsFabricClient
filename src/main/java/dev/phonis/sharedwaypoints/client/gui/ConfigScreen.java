@@ -19,53 +19,57 @@ class ConfigScreen
 {
 
     private static final TranslatableTextContent configTitle                           = new TranslatableTextContent(
-        "title.sharedwaypoints" + ".config");
+        "title.sharedwaypoints.config");
     private static final TranslatableTextContent waypointCategoryName                  = new TranslatableTextContent(
-        "category" + ".sharedwaypoints.waypoints");
+        "category.sharedwaypoints.waypoints");
     private static final TranslatableTextContent toggleWaypointsOption                 = new TranslatableTextContent(
-        "option" + ".sharedwaypoints" + ".toggleWaypoints");
+        "option.sharedwaypoints.toggleWaypoints");
     private static final TranslatableTextContent toggleWaypointsTooltip                = new TranslatableTextContent(
-        "tooltip" + ".sharedwaypoints.toggleWaypoints");
+        "tooltip.sharedwaypoints.toggleWaypoints");
     private static final TranslatableTextContent fullWaypointNamesOption               = new TranslatableTextContent(
-        "option" + ".sharedwaypoints" + ".fullWaypointNames");
+        "option.sharedwaypoints.fullWaypointNames");
     private static final TranslatableTextContent fullWaypointNamesTooltip              = new TranslatableTextContent(
-        "tooltip" + ".sharedwaypoints.fullWaypointNames");
+        "tooltip.sharedwaypoints.fullWaypointNames");
     private static final TranslatableTextContent highlightHoveredWaypointOption        = new TranslatableTextContent(
-        "option" + ".sharedwaypoints" + ".highlightHoveredWaypoint");
+        "option.sharedwaypoints.highlightHoveredWaypoint");
     private static final TranslatableTextContent highlightHoveredWaypointTooltip       = new TranslatableTextContent(
-        "tooltip" + ".sharedwaypoints.highlightHoveredWaypoint");
+        "tooltip.sharedwaypoints.highlightHoveredWaypoint");
     private static final TranslatableTextContent crossDimensionalWaypointsOption       = new TranslatableTextContent(
-        "option" + ".sharedwaypoints" + ".crossDimensionalWaypoints");
+        "option.sharedwaypoints.crossDimensionalWaypoints");
     private static final TranslatableTextContent crossDimensionalWaypointsTooltip      = new TranslatableTextContent(
-        "tooltip" + ".sharedwaypoints.crossDimensionalWaypoints");
+        "tooltip.sharedwaypoints.crossDimensionalWaypoints");
     private static final TranslatableTextContent renderScaleOption                     = new TranslatableTextContent(
-        "option" + ".sharedwaypoints" + ".renderScale");
+        "option.sharedwaypoints.renderScale");
     private static final TranslatableTextContent renderScaleTooltip                    = new TranslatableTextContent(
-        "tooltip" + ".sharedwaypoints.renderScale");
+        "tooltip.sharedwaypoints.renderScale");
     private static final TranslatableTextContent waypointColorOption                   = new TranslatableTextContent(
-        "option" + ".sharedwaypoints" + ".waypointColor");
+        "option.sharedwaypoints.waypointColor");
     private static final TranslatableTextContent waypointColorTooltip                  = new TranslatableTextContent(
-        "tooltip" + ".sharedwaypoints.waypointColor");
+        "tooltip.sharedwaypoints.waypointColor");
     private static final TranslatableTextContent waypointTransparencyOption            = new TranslatableTextContent(
-        "option" + ".sharedwaypoints" + ".waypointTransparency");
+        "option.sharedwaypoints.waypointTransparency");
     private static final TranslatableTextContent waypointTransparencyTooltip           = new TranslatableTextContent(
-        "tooltip" + ".sharedwaypoints.waypointTransparency");
+        "tooltip.sharedwaypoints.waypointTransparency");
     private static final TranslatableTextContent highlightWaypointColorOption          = new TranslatableTextContent(
-        "option" + ".sharedwaypoints" + ".highlightWaypointColor");
+        "option.sharedwaypoints.highlightWaypointColor");
     private static final TranslatableTextContent highlightWaypointColorTooltip         = new TranslatableTextContent(
-        "tooltip" + ".sharedwaypoints.highlightWaypointColor");
+        "tooltip.sharedwaypoints.highlightWaypointColor");
     private static final TranslatableTextContent highlightWaypointTransparencyOption   = new TranslatableTextContent(
-        "option" + ".sharedwaypoints" + ".highlightWaypointTransparency");
+        "option.sharedwaypoints.highlightWaypointTransparency");
     private static final TranslatableTextContent highlightWaypointTransparencyTooltip  = new TranslatableTextContent(
-        "tooltip" + ".sharedwaypoints.highlightWaypointTransparency");
+        "tooltip.sharedwaypoints.highlightWaypointTransparency");
     private static final TranslatableTextContent distanceBackgroundColorOption         = new TranslatableTextContent(
-        "option" + ".sharedwaypoints" + ".distanceBackgroundColor");
+        "option.sharedwaypoints.distanceBackgroundColor");
     private static final TranslatableTextContent distanceBackgroundColorTooltip        = new TranslatableTextContent(
-        "tooltip" + ".sharedwaypoints.distanceBackgroundColor");
+        "tooltip.sharedwaypoints.distanceBackgroundColor");
     private static final TranslatableTextContent distanceBackgroundTransparencyOption  = new TranslatableTextContent(
-        "option" + ".sharedwaypoints" + ".distanceBackgroundTransparency");
+        "option.sharedwaypoints.distanceBackgroundTransparency");
     private static final TranslatableTextContent distanceBackgroundTransparencyTooltip = new TranslatableTextContent(
-        "tooltip" + ".sharedwaypoints.distanceBackgroundTransparency");
+        "tooltip.sharedwaypoints.distanceBackgroundTransparency");
+    private static final TranslatableTextContent textColorOption                       = new TranslatableTextContent(
+        "option.sharedwaypoints.textColor");
+    private static final TranslatableTextContent textColorTooltip                      = new TranslatableTextContent(
+        "tooltip.sharedwaypoints.textColor");
     private static final TranslatableTextContent waypointsKeybindingsCategoryName      = new TranslatableTextContent(
         "category.sharedwaypoints.waypoints.keybindings");
     private static final TranslatableTextContent sWMenuBindingName                     = new TranslatableTextContent(
@@ -85,9 +89,8 @@ class ConfigScreen
     Screen getConfigScreen(Screen parent)
     {
         ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent)
-            // .setTransparentBackground(true)
+            .setTransparentBackground(true)
             .setTitle(MutableText.of(ConfigScreen.configTitle));
-
         builder.setSavingRunnable(SWConfig::trySave);
 
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
@@ -151,6 +154,12 @@ class ConfigScreen
                 SWConfig.INSTANCE.distanceBackground.a, 0, 255).setDefaultValue(SWConfig.defaultDistanceBackground.a)
             .setTooltip(MutableText.of(ConfigScreen.distanceBackgroundTransparencyTooltip))
             .setSaveConsumer(SWConfig.INSTANCE.distanceBackground::updateA).build());
+
+        category.addEntry(entryBuilder.startColorField(MutableText.of(ConfigScreen.textColorOption),
+                SWConfig.INSTANCE.textColor.toSheDanielColor())
+            .setDefaultValue(SWConfig.defaultTextColor.toInt() & 0x00FFFFFF)
+            .setTooltip(MutableText.of(ConfigScreen.textColorTooltip))
+            .setSaveConsumer2(SWConfig.INSTANCE.textColor::updateRGB).build());
 
         SubCategoryBuilder subCategoryBuilder = entryBuilder.startSubCategory(
             MutableText.of(ConfigScreen.waypointsKeybindingsCategoryName));

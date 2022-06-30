@@ -33,7 +33,7 @@ class RenderUtils
     public static
     boolean coordinateOnScreen(Vec3d position)
     {
-        return position != null && position.z > 0;
+        return position != null && position.z >= 0;
     }
 
     public static
