@@ -92,14 +92,17 @@ class WaypointRenderer
                                                                              : waypoint.name.substring(0, 1)
                                    .toUpperCase(Locale.ROOT);
         float scale      = SWConfig.INSTANCE.scale / 100F;
-        float textWidth  = textRenderer.getWidth(waypointLabel) * scale;
-        float textHeight = textRenderer.fontHeight * scale;
-        float labelX     = position.x - textWidth / 2F;
-        float labelY     = position.y - textHeight / 2F;
+        // -1 on width and height to ignore shadow since it will not be used
+        float textWidth  = textRenderer.getWidth(waypointLabel) - 1;
+        float textHeight = textRenderer.fontHeight - 1;
+        float padding    = textHeight * .2F;
         matrixStack.push();
-        matrixStack.translate(labelX, labelY, 0);
+        matrixStack.translate(position.x, position.y, 0);
         matrixStack.scale(scale, scale, 0);
-        textRenderer.draw(matrixStack, waypointLabel, 0, 0, 0xFFFFFFFF);
+        RenderUtils.renderRoundedBox(matrixStack, SWConfig.INSTANCE.plateBackground, -textWidth / 2F - padding,
+            -textHeight / 2F - padding,
+            textWidth / 2F + padding, textHeight / 2F + padding, 3, 25);
+        textRenderer.draw(matrixStack, waypointLabel, -textWidth / 2F, -textHeight / 2F, 0xFFFFFFFF);
         matrixStack.pop();
     }
 
