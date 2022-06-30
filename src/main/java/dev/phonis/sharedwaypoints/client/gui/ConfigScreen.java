@@ -123,34 +123,34 @@ class ConfigScreen
                 SWConfig.INSTANCE.plateBackground.toSheDanielColor())
             .setDefaultValue(SWConfig.defaultPlateBackground.toInt() & 0x00FFFFFF)
             .setTooltip(MutableText.of(ConfigScreen.waypointColorTooltip))
-            .setSaveConsumer2((value) -> SWConfig.INSTANCE.plateBackground.updateRGB(value)).build());
+            .setSaveConsumer2(SWConfig.INSTANCE.plateBackground::updateRGB).build());
 
         category.addEntry(entryBuilder.startIntSlider(MutableText.of(ConfigScreen.waypointTransparencyOption),
                 SWConfig.INSTANCE.plateBackground.a, 0, 255).setDefaultValue(SWConfig.defaultPlateBackground.a)
             .setTooltip(MutableText.of(ConfigScreen.waypointTransparencyTooltip))
-            .setSaveConsumer((value) -> SWConfig.INSTANCE.plateBackground.updateA(value)).build());
+            .setSaveConsumer(SWConfig.INSTANCE.plateBackground::updateA).build());
 
         category.addEntry(entryBuilder.startColorField(MutableText.of(ConfigScreen.highlightWaypointColorOption),
                 SWConfig.INSTANCE.fullBackground.toSheDanielColor())
             .setDefaultValue(SWConfig.defaultFullBackground.toInt() & 0x00FFFFFF)
             .setTooltip(MutableText.of(ConfigScreen.highlightWaypointColorTooltip))
-            .setSaveConsumer2((value) -> SWConfig.INSTANCE.fullBackground.updateRGB(value)).build());
+            .setSaveConsumer2(SWConfig.INSTANCE.fullBackground::updateRGB).build());
 
         category.addEntry(entryBuilder.startIntSlider(MutableText.of(ConfigScreen.highlightWaypointTransparencyOption),
                 SWConfig.INSTANCE.fullBackground.a, 0, 255).setDefaultValue(SWConfig.defaultFullBackground.a)
             .setTooltip(MutableText.of(ConfigScreen.highlightWaypointTransparencyTooltip))
-            .setSaveConsumer((value) -> SWConfig.INSTANCE.fullBackground.updateA(value)).build());
+            .setSaveConsumer(SWConfig.INSTANCE.fullBackground::updateA).build());
 
         category.addEntry(entryBuilder.startColorField(MutableText.of(ConfigScreen.distanceBackgroundColorOption),
                 SWConfig.INSTANCE.distanceBackground.toSheDanielColor())
             .setDefaultValue(SWConfig.defaultDistanceBackground.toInt() & 0x00FFFFFF)
             .setTooltip(MutableText.of(ConfigScreen.distanceBackgroundColorTooltip))
-            .setSaveConsumer2((value) -> SWConfig.INSTANCE.distanceBackground.updateRGB(value)).build());
+            .setSaveConsumer2(SWConfig.INSTANCE.distanceBackground::updateRGB).build());
 
         category.addEntry(entryBuilder.startIntSlider(MutableText.of(ConfigScreen.distanceBackgroundTransparencyOption),
                 SWConfig.INSTANCE.distanceBackground.a, 0, 255).setDefaultValue(SWConfig.defaultDistanceBackground.a)
             .setTooltip(MutableText.of(ConfigScreen.distanceBackgroundTransparencyTooltip))
-            .setSaveConsumer((value) -> SWConfig.INSTANCE.distanceBackground.updateA(value)).build());
+            .setSaveConsumer(SWConfig.INSTANCE.distanceBackground::updateA).build());
 
         SubCategoryBuilder subCategoryBuilder = entryBuilder.startSubCategory(
             MutableText.of(ConfigScreen.waypointsKeybindingsCategoryName));
