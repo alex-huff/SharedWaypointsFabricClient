@@ -1,7 +1,5 @@
 package dev.phonis.sharedwaypoints.client.state;
 
-import dev.phonis.sharedwaypoints.client.networking.SWDimension;
-import dev.phonis.sharedwaypoints.client.networking.SWLocation;
 import dev.phonis.sharedwaypoints.client.networking.SWWaypoint;
 
 import java.util.ArrayList;
