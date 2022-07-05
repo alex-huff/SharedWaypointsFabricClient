@@ -21,8 +21,6 @@ class SWStateManager
     SWStateManager()
     {
         this.waypoints = new ArrayList<>();
-        this.waypoints.add(new SWWaypoint("testWaypoint", new SWLocation(SWDimension.OVERWORLD, 0, 0, 0)));
-        this.waypoints.add(new SWWaypoint("testWaypointTwo", new SWLocation(SWDimension.OVERWORLD, 100, 100, 100)));
     }
 
     public synchronized
