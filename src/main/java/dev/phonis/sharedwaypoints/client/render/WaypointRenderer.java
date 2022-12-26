@@ -104,8 +104,7 @@ class WaypointRenderer
         float     waypointTextHeight = textRenderer.fontHeight - 1;
         float     padding            = waypointTextHeight * .2F;
         RGBAColor textColor          = SWConfig.INSTANCE.textColor;
-        RGBAColor waypointColor      = highlighted ? SWConfig.INSTANCE.fullBackground
-                                                   : SWConfig.INSTANCE.plateBackground;
+        RGBAColor waypointColor = highlighted ? SWConfig.INSTANCE.fullBackground : SWConfig.INSTANCE.plateBackground;
         matrixStack.push();
         matrixStack.translate(position.x, position.y, 0);
         matrixStack.scale(scale, scale, 0);

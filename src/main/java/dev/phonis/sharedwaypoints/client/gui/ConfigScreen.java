@@ -88,13 +88,13 @@ class ConfigScreen
     public static
     Screen getConfigScreen(Screen parent)
     {
-        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent)
-            .setTransparentBackground(true)
+        ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent).setTransparentBackground(true)
             .setTitle(MutableText.of(ConfigScreen.configTitle));
         builder.setSavingRunnable(SWConfig::trySave);
 
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
-        ConfigCategory category = builder.getOrCreateCategory(MutableText.of(ConfigScreen.waypointCategoryName));
+        ConfigCategory     category     = builder.getOrCreateCategory(
+            MutableText.of(ConfigScreen.waypointCategoryName));
 
         category.addEntry(entryBuilder.startBooleanToggle(MutableText.of(ConfigScreen.toggleWaypointsOption),
                 SWConfig.INSTANCE.renderWaypoints).setDefaultValue(SWConfig.defaultRenderWaypoints)

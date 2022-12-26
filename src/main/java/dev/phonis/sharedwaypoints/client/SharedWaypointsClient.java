@@ -4,7 +4,6 @@ import dev.phonis.sharedwaypoints.client.keybindings.Keybindings;
 import dev.phonis.sharedwaypoints.client.networking.SWPacket;
 import dev.phonis.sharedwaypoints.client.networking.SWRegister;
 import dev.phonis.sharedwaypoints.client.networking.SWSurvivalReceiver;
-import dev.phonis.sharedwaypoints.client.render.WaypointRenderer;
 import dev.phonis.sharedwaypoints.client.state.SWStateManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -18,10 +17,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
 import java.io.ByteArrayOutputStream;
