@@ -1,7 +1,7 @@
 package dev.phonis.sharedwaypoints.client.gui;
 
-import dev.phonis.sharedwaypoints.client.SharedWaypointsClient;
 import dev.phonis.sharedwaypoints.client.config.SWConfig;
+import dev.phonis.sharedwaypoints.client.keybindings.Keybindings;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
@@ -70,8 +70,8 @@ class ConfigScreen
         "option.sharedwaypoints.textColor");
     private static final TranslatableTextContent textColorTooltip                      = new TranslatableTextContent(
         "tooltip.sharedwaypoints.textColor");
-    private static final TranslatableTextContent waypointsKeybindingsCategoryName      = new TranslatableTextContent(
-        "category.sharedwaypoints.waypoints.keybindings");
+    private static final TranslatableTextContent keybindingsCategoryName               = new TranslatableTextContent(
+        "category.sharedwaypoints.keybindings");
     private static final TranslatableTextContent sWMenuBindingName                     = new TranslatableTextContent(
         "binding.sharedwaypoints.sWMenu");
     private static final TranslatableTextContent toggleWaypointsBindingName            = new TranslatableTextContent(
@@ -82,8 +82,6 @@ class ConfigScreen
         "binding.sharedwaypoints.toggleClosestHighlight");
     private static final TranslatableTextContent toggleCrossDimensionalBindingName     = new TranslatableTextContent(
         "binding.sharedwaypoints.toggleCrossDimensional");
-    private static final TranslatableTextContent waypointKeybindingsCategoryTooltip    = new TranslatableTextContent(
-        "tooltip.sharedwaypoints.waypoints.keybindings");
 
     public static
     Screen getConfigScreen(Screen parent)
@@ -93,8 +91,7 @@ class ConfigScreen
         builder.setSavingRunnable(SWConfig::trySave);
 
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
-        ConfigCategory     category     = builder.getOrCreateCategory(
-            MutableText.of(ConfigScreen.waypointCategoryName));
+        ConfigCategory category = builder.getOrCreateCategory(MutableText.of(ConfigScreen.waypointCategoryName));
 
         category.addEntry(entryBuilder.startBooleanToggle(MutableText.of(ConfigScreen.toggleWaypointsOption),
                 SWConfig.INSTANCE.renderWaypoints).setDefaultValue(SWConfig.defaultRenderWaypoints)
@@ -117,10 +114,10 @@ class ConfigScreen
             .setSaveConsumer(newValue -> SWConfig.INSTANCE.crossDimensionalWaypoints = newValue).build());
 
         category.addEntry(
-            entryBuilder.startIntSlider(MutableText.of(ConfigScreen.renderScaleOption), SWConfig.INSTANCE.scale, 0, 100)
-                .setDefaultValue(SWConfig.defaultRenderScale)
+            entryBuilder.startIntSlider(MutableText.of(ConfigScreen.renderScaleOption), SWConfig.INSTANCE.renderScale,
+                    0, 100).setDefaultValue(SWConfig.defaultRenderScale)
                 .setTooltip(MutableText.of(ConfigScreen.renderScaleTooltip))
-                .setSaveConsumer((value) -> SWConfig.INSTANCE.scale = value).build());
+                .setSaveConsumer((value) -> SWConfig.INSTANCE.renderScale = value).build());
 
         category.addEntry(entryBuilder.startColorField(MutableText.of(ConfigScreen.waypointColorOption),
                 SWConfig.INSTANCE.plateBackground.toSheDanielColor())
@@ -161,24 +158,20 @@ class ConfigScreen
             .setTooltip(MutableText.of(ConfigScreen.textColorTooltip))
             .setSaveConsumer2(SWConfig.INSTANCE.textColor::updateRGB).build());
 
-        SubCategoryBuilder subCategoryBuilder = entryBuilder.startSubCategory(
-            MutableText.of(ConfigScreen.waypointsKeybindingsCategoryName));
+        ConfigCategory keybindingsCategory = builder.getOrCreateCategory(
+            MutableText.of(ConfigScreen.keybindingsCategoryName));
 
-        ConfigScreen.addKeybindingEntryToSubCategory(subCategoryBuilder, entryBuilder,
-            SharedWaypointsClient.openConfigScreenKeyBinding, ConfigScreen.sWMenuBindingName);
-        ConfigScreen.addKeybindingEntryToSubCategory(subCategoryBuilder, entryBuilder,
-            SharedWaypointsClient.toggleWaypointsKeyBinding, ConfigScreen.toggleWaypointsBindingName);
-        ConfigScreen.addKeybindingEntryToSubCategory(subCategoryBuilder, entryBuilder,
-            SharedWaypointsClient.toggleWaypointFullNamesKeyBinding, toggleFullNamesBindingName);
-        ConfigScreen.addKeybindingEntryToSubCategory(subCategoryBuilder, entryBuilder,
-            SharedWaypointsClient.toggleHighlightClosestKeyBinding, ConfigScreen.toggleHighlightClosestBindingName);
-        ConfigScreen.addKeybindingEntryToSubCategory(subCategoryBuilder, entryBuilder,
-            SharedWaypointsClient.toggleCrossDimensionalWaypointsKeyBinding,
+        ConfigScreen.addKeybindingEntryToCategory(keybindingsCategory, entryBuilder,
+            Keybindings.openConfigScreenKeyBinding, ConfigScreen.sWMenuBindingName);
+        ConfigScreen.addKeybindingEntryToCategory(keybindingsCategory, entryBuilder,
+            Keybindings.toggleWaypointsKeyBinding, ConfigScreen.toggleWaypointsBindingName);
+        ConfigScreen.addKeybindingEntryToCategory(keybindingsCategory, entryBuilder,
+            Keybindings.toggleWaypointFullNamesKeyBinding, toggleFullNamesBindingName);
+        ConfigScreen.addKeybindingEntryToCategory(keybindingsCategory, entryBuilder,
+            Keybindings.toggleHighlightClosestKeyBinding, ConfigScreen.toggleHighlightClosestBindingName);
+        ConfigScreen.addKeybindingEntryToCategory(keybindingsCategory, entryBuilder,
+            Keybindings.toggleCrossDimensionalWaypointsKeyBinding,
             ConfigScreen.toggleCrossDimensionalBindingName);
-
-        category.addEntry(
-            subCategoryBuilder.setExpanded(true).setTooltip(MutableText.of(waypointKeybindingsCategoryTooltip))
-                .build());
 
         return builder.build();
     }

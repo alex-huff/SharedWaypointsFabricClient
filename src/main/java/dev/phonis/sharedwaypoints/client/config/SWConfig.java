@@ -17,7 +17,8 @@ public
 class SWConfig implements Serializable
 {
 
-    public static final  String    configFile                       = SharedWaypointsClient.configDirectory +
+    public static final  String     configDirectory                           = "config/SharedWaypoints/";
+    public static final  String    configFile                       = SWConfig.configDirectory +
                                                                       "SWConfig.json";
     private static final Gson      GSON                             = new GsonBuilder().setPrettyPrinting().create();
     public static final  boolean   defaultCrossDimensionalWaypoints = true;
@@ -35,7 +36,7 @@ class SWConfig implements Serializable
     public boolean   highlightClosest;
     public boolean   renderWaypoints;
     public boolean   fullWaypointNames;
-    public int       scale;
+    public int       renderScale;
     public RGBAColor plateBackground;
     public RGBAColor fullBackground;
     public RGBAColor distanceBackground;
@@ -48,7 +49,7 @@ class SWConfig implements Serializable
         this.highlightClosest          = SWConfig.defaultHighlightClosest;
         this.renderWaypoints           = SWConfig.defaultRenderWaypoints;
         this.fullWaypointNames         = SWConfig.defaultFullWaypointNames;
-        this.scale                     = SWConfig.defaultRenderScale;
+        this.renderScale               = SWConfig.defaultRenderScale;
         this.plateBackground           = SWConfig.defaultPlateBackground;
         this.fullBackground            = SWConfig.defaultFullBackground;
         this.distanceBackground        = SWConfig.defaultDistanceBackground;

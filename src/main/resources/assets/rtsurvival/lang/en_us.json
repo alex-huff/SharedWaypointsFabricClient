@@ -7,7 +7,7 @@
   "title.sharedwaypoints.config": "SharedWaypoints Settings",
   "category.sharedwaypoints.waypoints": "Waypoints",
   "category.sharedwaypoints.sharedWaypoints": "SharedWaypoints",
-  "category.sharedwaypoints.waypoints.keybindings": "Keybindings",
+  "category.sharedwaypoints.keybindings": "Keybindings",
   "option.sharedwaypoints.toggleWaypoints": "Waypoint Rendering",
   "option.sharedwaypoints.renderScale": "Waypoint Rendering Scale",
   "option.sharedwaypoints.fullWaypointNames": "Full Waypoint Names",

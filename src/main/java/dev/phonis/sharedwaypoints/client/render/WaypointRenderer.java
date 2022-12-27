@@ -98,7 +98,7 @@ class WaypointRenderer
         String waypointLabel = (SWConfig.INSTANCE.fullWaypointNames || highlighted) ? waypoint.name
                                                                                     : waypoint.name.substring(0, 1)
                                    .toUpperCase(Locale.ROOT);
-        float scale = SWConfig.INSTANCE.scale / 100F;
+        float scale = SWConfig.INSTANCE.renderScale / 100F;
         // -1 on width and height to ignore shadow since it will not be used
         float     waypointTextWidth  = textRenderer.getWidth(waypointLabel) - 1;
         float     waypointTextHeight = textRenderer.fontHeight - 1;

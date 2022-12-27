@@ -29,25 +29,7 @@ class SharedWaypointsClient implements ClientModInitializer
 {
 
     public static final  int        protocolVersion                           = 1;
-    public static final  String     configDirectory                           = "config/SharedWaypoints/";
     public static final  Identifier sWIdentifier                              = new Identifier("sharedwaypoints:main");
-    private static final String     category
-                                                                              = "category.sharedwaypoints.sharedWaypoints";
-    public static final  KeyBinding openConfigScreenKeyBinding                = KeyBindingHelper.registerKeyBinding(
-        new KeyBinding("binding.sharedwaypoints.sWMenu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G,
-            SharedWaypointsClient.category));
-    public static final  KeyBinding toggleWaypointsKeyBinding                 = KeyBindingHelper.registerKeyBinding(
-        new KeyBinding("binding.sharedwaypoints.toggleWaypoints", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_N,
-            SharedWaypointsClient.category));
-    public static final  KeyBinding toggleWaypointFullNamesKeyBinding         = KeyBindingHelper.registerKeyBinding(
-        new KeyBinding("binding.sharedwaypoints.toggleFullNames", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN,
-            SharedWaypointsClient.category));
-    public static final  KeyBinding toggleHighlightClosestKeyBinding          = KeyBindingHelper.registerKeyBinding(
-        new KeyBinding("binding.sharedwaypoints.toggleClosestHighlight", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN,
-            SharedWaypointsClient.category));
-    public static final  KeyBinding toggleCrossDimensionalWaypointsKeyBinding = KeyBindingHelper.registerKeyBinding(
-        new KeyBinding("binding.sharedwaypoints.toggleCrossDimensional", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN,
-            SharedWaypointsClient.category));
 
     @Override
     public
@@ -81,6 +63,7 @@ class SharedWaypointsClient implements ClientModInitializer
         ClientPlayConnectionEvents.DISCONNECT.register(
             (clientPlayNetworkHandler, minecraftClient) -> SWStateManager.INSTANCE.clearState());
         ClientTickEvents.END_CLIENT_TICK.register(Keybindings::handle);
+        Keybindings.handle(MinecraftClient.getInstance()); // Force Keybindings class to be loaded
     }
 
     public static
