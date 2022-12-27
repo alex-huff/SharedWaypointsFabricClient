@@ -11,7 +11,6 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.C2SPlayChannelEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
@@ -82,7 +81,6 @@ class SharedWaypointsClient implements ClientModInitializer
         ClientPlayConnectionEvents.DISCONNECT.register(
             (clientPlayNetworkHandler, minecraftClient) -> SWStateManager.INSTANCE.clearState());
         ClientTickEvents.END_CLIENT_TICK.register(Keybindings::handle);
-        HudRenderCallback.EVENT.register((a, b) -> System.out.println(System.currentTimeMillis()));
     }
 
     public static

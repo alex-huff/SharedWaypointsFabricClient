@@ -7,7 +7,6 @@
   "client":
   [
     "MixinGameRenderer",
-    "MixinHudRender",
     "math.MixinMatrix4f"
   ],
   "injectors": {

@@ -203,7 +203,7 @@ class ConfigScreen
     {
         return entryBuilder.startKeyCodeField(MutableText.of(translationKey),
                 KeyBindingHelper.getBoundKeyOf(keyBinding)).setDefaultValue(keyBinding.getDefaultKey())
-            .setSaveConsumer((code) ->
+            .setKeySaveConsumer((code) ->
             {
                 keyBinding.setBoundKey(code);
                 KeyBinding.updateKeysByCode();

@@ -38,4 +38,10 @@ class MixinGameRenderer
         }
     }
 
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderFloatingItem(IIF)V", shift =
+        At.Shift.AFTER), method = "render")
+    void onHudRender(float tickDelta, long startTime, boolean tick, CallbackInfo ci) {
+        WaypointRenderer.hudRenderTasks.forEach(Runnable::run);
+    }
+
 }
