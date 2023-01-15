@@ -1,13 +1,13 @@
 package dev.phonis.sharedwaypoints.client.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import dev.phonis.sharedwaypoints.client.math.Projector;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Matrix4f;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vector4f;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 
 public
@@ -46,17 +46,14 @@ class RenderUtils
         double          dy              = position.y - camera.getPos().y;
         double          dz              = position.z - camera.getPos().z;
         Vector4f        cameraDirection = new Vector4f((float) dx, (float) dy, (float) dz, 1.f);
-        cameraDirection.transform(positionMatrix);
+        cameraDirection.mul(positionMatrix);
         int[] viewport = new int[4];
         GL11.glGetIntegerv(GL11.GL_VIEWPORT, viewport);
-        Matrix4f projectionMatrix = RenderSystem.getProjectionMatrix().copy();
-        Matrix4f modelViewMatrix  = RenderSystem.getModelViewMatrix().copy();
-        // Switch order
-        projectionMatrix.transpose();
-        modelViewMatrix.transpose();
-        projectionMatrix.multiply(modelViewMatrix);
-        Vec3d screenCoords = ((Projector) (Object) projectionMatrix).project(cameraDirection.getX(),
-            cameraDirection.getY(), cameraDirection.getZ(), viewport);
+        Matrix4f projectionMatrix = new Matrix4f(RenderSystem.getProjectionMatrix());
+        Matrix4f modelViewMatrix  = new Matrix4f(RenderSystem.getModelViewMatrix());
+        projectionMatrix.mul(modelViewMatrix);
+        Vector3f screenCoords = projectionMatrix.project(cameraDirection.x(), cameraDirection.y(),
+            cameraDirection.z(), viewport, new Vector3f());
         int displayHeight = minecraftClient.getWindow().getHeight();
         return new Vec3d(screenCoords.x / minecraftClient.getWindow().getScaleFactor(),
             (displayHeight - screenCoords.y) / minecraftClient.getWindow().getScaleFactor(), screenCoords.z);
@@ -67,13 +64,15 @@ class RenderUtils
                           double startY, double endX, double endY, double radiusCorner1, double radiusCorner2,
                           double radiusCorner3, double radiusCorner4, int samples)
     {
-        double[][] corners = new double[][]{ new double[]{ endX - radiusCorner4, endY - radiusCorner4, radiusCorner4 },
-                                             new double[]{ endX - radiusCorner2, startY + radiusCorner2,
-                                                           radiusCorner2 },
-                                             new double[]{ startX + radiusCorner1, startY + radiusCorner1,
-                                                           radiusCorner1 },
-                                             new double[]{ startX + radiusCorner3, endY - radiusCorner3,
-                                                           radiusCorner3 } };
+        double[][] corners = new double[][]{
+            new double[]{ endX - radiusCorner4, endY - radiusCorner4, radiusCorner4 }, new double[]{
+            endX - radiusCorner2, startY + radiusCorner2, radiusCorner2
+        }, new double[]{
+            startX + radiusCorner1, startY + radiusCorner1, radiusCorner1
+        }, new double[]{
+            startX + radiusCorner3, endY - radiusCorner3, radiusCorner3
+        }
+        };
         BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
         bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
         for (int i = 0; i < 4; i++)
@@ -89,7 +88,7 @@ class RenderUtils
                     .color(red, green, blue, alpha).next();
             }
         }
-        BufferRenderer.drawWithShader(bufferBuilder.end());
+        BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
     }
 
     public static
@@ -104,7 +103,7 @@ class RenderUtils
         float    g              = (float) (color >> 8 & 255) / 255.0F;
         float    b              = (float) (color & 255) / 255.0F;
         RenderUtils.setupRender();
-        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorProgram);
         RenderUtils.renderRoundedBox(positionMatrix, r, g, b, a, xStart, yStart, xEnd, yEnd, radiusCorner1,
             radiusCorner2, radiusCorner3, radiusCorner4, samples);
         RenderUtils.endRender();
