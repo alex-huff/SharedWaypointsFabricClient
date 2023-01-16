@@ -60,6 +60,10 @@ class WaypointRenderer
                     adjusted ? swWaypoint.location.z / 8d : swWaypoint.location.z);
                 Vec3d pixelCoordinates = RenderUtils.worldSpaceToScreenSpace(
                     new Vec3d(adjustedLocation.x, adjustedLocation.y, adjustedLocation.z), matrixStack);
+                if (swWaypoint.name.equals("IndustrialDistrict"))
+                {
+                    System.out.println(pixelCoordinates.z);
+                }
                 return new WaypointRenderer.RenderContext3D(adjustedLocation, pixelCoordinates, swWaypoint);
             }).filter(renderContext3D -> RenderUtils.coordinateOnScreen(renderContext3D.screenCoordinates))
             .map(renderContext3D ->

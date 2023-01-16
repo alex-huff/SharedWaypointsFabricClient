@@ -1,6 +1,7 @@
 package dev.phonis.sharedwaypoints.client.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import dev.phonis.sharedwaypoints.client.math.Projector;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
@@ -45,15 +46,16 @@ class RenderUtils
         double          dx              = position.x - camera.getPos().x;
         double          dy              = position.y - camera.getPos().y;
         double          dz              = position.z - camera.getPos().z;
-        Vector4f        cameraDirection = new Vector4f((float) dx, (float) dy, (float) dz, 1.f);
+        Vector4f        cameraDirection = new Vector4f((float) dx, (float) dy, (float) dz, 1F);
         cameraDirection.mul(positionMatrix);
         int[] viewport = new int[4];
         GL11.glGetIntegerv(GL11.GL_VIEWPORT, viewport);
         Matrix4f projectionMatrix = new Matrix4f(RenderSystem.getProjectionMatrix());
         Matrix4f modelViewMatrix  = new Matrix4f(RenderSystem.getModelViewMatrix());
         projectionMatrix.mul(modelViewMatrix);
-        Vector3f screenCoords = projectionMatrix.project(cameraDirection.x(), cameraDirection.y(),
-            cameraDirection.z(), viewport, new Vector3f());
+        Vec3d screenCoords = ((Projector) (Object) projectionMatrix).projectNonClampZ(cameraDirection.x(),
+            cameraDirection.y(),
+            cameraDirection.z(), viewport);
         int displayHeight = minecraftClient.getWindow().getHeight();
         return new Vec3d(screenCoords.x / minecraftClient.getWindow().getScaleFactor(),
             (displayHeight - screenCoords.y) / minecraftClient.getWindow().getScaleFactor(), screenCoords.z);
