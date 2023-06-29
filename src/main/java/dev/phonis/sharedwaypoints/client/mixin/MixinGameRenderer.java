@@ -53,8 +53,8 @@ class MixinGameRenderer
 
     @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderFloatingItem(IIF)V",
                      shift = At.Shift.AFTER), method = "render", locals = LocalCapture.CAPTURE_FAILHARD)
-    void onHudRender(float tickDelta, long startTime, boolean tick, CallbackInfo ci, boolean t, int i, int j,
-                     Window window, Matrix4f matrix4f, MatrixStack matrixStack, DrawContext drawContext)
+    void onHudRender(float tickDelta, long startTime, boolean tick, CallbackInfo ci, int i, int j, Window window,
+                     Matrix4f matrix4f, MatrixStack matrixStack, DrawContext drawContext)
     {
         WaypointRenderer.hudRenderTasks.forEach(consumer -> consumer.accept(drawContext));
     }
