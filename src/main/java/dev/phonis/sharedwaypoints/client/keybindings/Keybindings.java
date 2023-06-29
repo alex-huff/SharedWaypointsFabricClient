@@ -1,6 +1,5 @@
 package dev.phonis.sharedwaypoints.client.keybindings;
 
-import dev.phonis.sharedwaypoints.client.SharedWaypointsClient;
 import dev.phonis.sharedwaypoints.client.config.SWConfig;
 import dev.phonis.sharedwaypoints.client.gui.ConfigScreen;
 import dev.phonis.sharedwaypoints.client.state.SWStateManager;

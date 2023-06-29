@@ -12,37 +12,37 @@ class MixinMatrix4f implements Projector
 {
 
     @Shadow
-    protected float m00;
+    float m00;
     @Shadow
-    protected float m01;
+    float m01;
     @Shadow
-    protected float m02;
+    float m02;
     @Shadow
-    protected float m03;
+    float m03;
     @Shadow
-    protected float m10;
+    float m10;
     @Shadow
-    protected float m11;
+    float m11;
     @Shadow
-    protected float m12;
+    float m12;
     @Shadow
-    protected float m13;
+    float m13;
     @Shadow
-    protected float m20;
+    float m20;
     @Shadow
-    protected float m21;
+    float m21;
     @Shadow
-    protected float m22;
+    float m22;
     @Shadow
-    protected float m23;
+    float m23;
     @Shadow
-    protected float m30;
+    float m30;
     @Shadow
-    protected float m31;
+    float m31;
     @Shadow
-    protected float m32;
+    float m32;
     @Shadow
-    protected float m33;
+    float m33;
 
     @Override
     public

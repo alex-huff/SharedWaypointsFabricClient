@@ -7,7 +7,6 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 
@@ -53,7 +52,7 @@ class RenderUtils
         Matrix4f projectionMatrix = new Matrix4f(RenderSystem.getProjectionMatrix());
         Matrix4f modelViewMatrix  = new Matrix4f(RenderSystem.getModelViewMatrix());
         projectionMatrix.mul(modelViewMatrix);
-        Vec3d screenCoords = ((Projector) (Object) projectionMatrix).projectNonClampZ(cameraDirection.x(),
+        Vec3d screenCoords = ((Projector) projectionMatrix).projectNonClampZ(cameraDirection.x(),
             cameraDirection.y(),
             cameraDirection.z(), viewport);
         int displayHeight = minecraftClient.getWindow().getHeight();
