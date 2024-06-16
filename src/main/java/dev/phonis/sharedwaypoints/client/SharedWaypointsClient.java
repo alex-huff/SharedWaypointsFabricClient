@@ -4,21 +4,17 @@ import dev.phonis.sharedwaypoints.client.keybindings.Keybindings;
 import dev.phonis.sharedwaypoints.client.networking.SWPacket;
 import dev.phonis.sharedwaypoints.client.networking.SWRegister;
 import dev.phonis.sharedwaypoints.client.networking.SWSurvivalReceiver;
+import dev.phonis.sharedwaypoints.client.networking.payload.SWPayload;
 import dev.phonis.sharedwaypoints.client.state.SWStateManager;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.C2SPlayChannelEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.util.InputUtil;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
-import org.lwjgl.glfw.GLFW;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -28,27 +24,26 @@ public
 class SharedWaypointsClient implements ClientModInitializer
 {
 
-    public static final  int        protocolVersion                           = 1;
-    public static final  Identifier sWIdentifier                              = new Identifier("sharedwaypoints:main");
+    public static final int protocolVersion = 1;
 
     @Override
     public
     void onInitializeClient()
     {
-        ClientPlayNetworking.registerGlobalReceiver(sWIdentifier, SWSurvivalReceiver.INSTANCE);
+        PayloadTypeRegistry.playC2S().register(SWPayload.id, SWPayload.codec);
+        PayloadTypeRegistry.playS2C().register(SWPayload.id, SWPayload.codec);
+        ClientPlayNetworking.registerGlobalReceiver(SWPayload.id, SWSurvivalReceiver.INSTANCE);
         C2SPlayChannelEvents.REGISTER.register((clientPlayNetworkHandler, packetSender, minecraftClient, ids) ->
         {
             for (Identifier id : ids)
             {
-                if (id.equals(SharedWaypointsClient.sWIdentifier))
+                if (id.equals(SWPayload.id.id()))
                 {
                     try
                     {
                         if (Thread.currentThread().getName().equals("Render thread"))
                         {
-                            clientPlayNetworkHandler.sendPacket(ClientPlayNetworking.createC2SPacket(sWIdentifier,
-                                SharedWaypointsClient.packetToByteBuf(
-                                    new SWRegister(SharedWaypointsClient.protocolVersion))));
+                            clientPlayNetworkHandler.sendPacket(ClientPlayNetworking.createC2SPacket(new SWPayload(SharedWaypointsClient.packetToBytes(new SWRegister(SharedWaypointsClient.protocolVersion)))));
                         }
                     }
                     catch (IOException e)
@@ -60,8 +55,7 @@ class SharedWaypointsClient implements ClientModInitializer
                 }
             }
         });
-        ClientPlayConnectionEvents.DISCONNECT.register(
-            (clientPlayNetworkHandler, minecraftClient) -> SWStateManager.INSTANCE.clearState());
+        ClientPlayConnectionEvents.DISCONNECT.register((clientPlayNetworkHandler, minecraftClient) -> SWStateManager.INSTANCE.clearState());
         ClientTickEvents.END_CLIENT_TICK.register(Keybindings::handle);
         Keybindings.handle(MinecraftClient.getInstance()); // Force Keybindings class to be loaded
     }
@@ -78,8 +72,7 @@ class SharedWaypointsClient implements ClientModInitializer
                 return;
             }
 
-            handler.sendPacket(
-                ClientPlayNetworking.createC2SPacket(sWIdentifier, SharedWaypointsClient.packetToByteBuf(packet)));
+            ClientPlayNetworking.send(new SWPayload(SharedWaypointsClient.packetToBytes(packet)));
         }
         catch (IOException e)
         {
@@ -88,18 +81,15 @@ class SharedWaypointsClient implements ClientModInitializer
     }
 
     private static
-    PacketByteBuf packetToByteBuf(SWPacket packet) throws IOException
+    byte[] packetToBytes(SWPacket packet) throws IOException
     {
-        ByteArrayOutputStream baos         = new ByteArrayOutputStream();
-        DataOutputStream      das          = new DataOutputStream(baos);
-        PacketByteBuf         packetBuffer = PacketByteBufs.create();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        DataOutputStream      das  = new DataOutputStream(baos);
 
         das.writeByte(packet.getID());
         packet.toBytes(das);
         das.close();
-        packetBuffer.writeBytes(baos.toByteArray());
-
-        return packetBuffer;
+        return baos.toByteArray();
     }
 
 }

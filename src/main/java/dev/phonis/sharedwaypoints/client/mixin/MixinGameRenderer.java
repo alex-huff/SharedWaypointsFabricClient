@@ -6,9 +6,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.DimensionEffects;
 import net.minecraft.client.render.GameRenderer;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.Window;
-import net.minecraft.client.util.math.MatrixStack;
 import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -31,9 +32,10 @@ class MixinGameRenderer
     @Shadow
     MinecraftClient client;
 
-    @Inject(at = @At(value = "FIELD", target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z",
-                     opcode = Opcodes.GETFIELD, ordinal = 0), method = "renderWorld")
-    void onWorldRender(float tickDelta, long limitTime, MatrixStack matrixStack, CallbackInfo ci)
+    @Inject(
+        at = @At(
+            value = "FIELD", target = "Lnet/minecraft/client/render/GameRenderer;renderHand:Z", opcode = Opcodes.GETFIELD, ordinal = 0), method = "renderWorld")
+    void onWorldRender(RenderTickCounter renderTickCounter, CallbackInfo ci)
     {
         // Clear any hudRenderTasks from last tick.
         WaypointRenderer.hudRenderTasks.clear();
@@ -47,14 +49,15 @@ class MixinGameRenderer
 
         if (SWConfig.INSTANCE.renderWaypoints)
         {
-            WaypointRenderer.renderWaypoints(matrixStack, currentDimension);
+            WaypointRenderer.renderWaypoints(currentDimension);
         }
     }
 
-    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderFloatingItem(IIF)V",
-                     shift = At.Shift.AFTER), method = "render", locals = LocalCapture.CAPTURE_FAILHARD)
-    void onHudRender(float tickDelta, long startTime, boolean tick, CallbackInfo ci, int i, int j, Window window,
-                     Matrix4f matrix4f, MatrixStack matrixStack, DrawContext drawContext)
+    @Inject(
+        at = @At(
+            value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderFloatingItem(Lnet/minecraft/client/gui/DrawContext;F)V", shift = At.Shift.AFTER), method = "render", locals = LocalCapture.CAPTURE_FAILHARD)
+    void onHudRender(RenderTickCounter renderTickCounter, boolean tick, CallbackInfo ci, boolean bl, int i, int j,
+                     Window window, Matrix4f matrix4f, Matrix4fStack matrix4fStack, DrawContext drawContext)
     {
         WaypointRenderer.hudRenderTasks.forEach(consumer -> consumer.accept(drawContext));
     }

@@ -7,6 +7,7 @@ import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
 
@@ -37,26 +38,26 @@ class RenderUtils
     }
 
     public static
-    Vec3d worldSpaceToScreenSpace(Vec3d position, MatrixStack matrixStack)
+    Vec3d worldSpaceToScreenSpace(Vec3d position)
     {
         MinecraftClient minecraftClient = MinecraftClient.getInstance();
         Camera          camera          = minecraftClient.getEntityRenderDispatcher().camera;
-        Matrix4f        positionMatrix  = matrixStack.peek().getPositionMatrix();
         double          dx              = position.x - camera.getPos().x;
         double          dy              = position.y - camera.getPos().y;
         double          dz              = position.z - camera.getPos().z;
         Vector4f        cameraDirection = new Vector4f((float) dx, (float) dy, (float) dz, 1F);
-        cameraDirection.mul(positionMatrix);
+        Quaternionf     quaternion      = camera.getRotation().conjugate(new Quaternionf());
+        cameraDirection.mul((new Matrix4f()).rotation(quaternion));
         int[] viewport = new int[4];
         GL11.glGetIntegerv(GL11.GL_VIEWPORT, viewport);
         Matrix4f projectionMatrix = new Matrix4f(RenderSystem.getProjectionMatrix());
         Matrix4f modelViewMatrix  = new Matrix4f(RenderSystem.getModelViewMatrix());
         projectionMatrix.mul(modelViewMatrix);
-        Vec3d screenCoords = ((Projector) projectionMatrix).projectNonClampZ(cameraDirection.x(),
-            cameraDirection.y(),
-            cameraDirection.z(), viewport);
+        Vec3d screenCoords
+            = ((Projector) projectionMatrix).projectNonClampZ(cameraDirection.x(), cameraDirection.y(), cameraDirection.z(), viewport);
         int displayHeight = minecraftClient.getWindow().getHeight();
-        return new Vec3d(screenCoords.x / minecraftClient.getWindow().getScaleFactor(),
+        return new Vec3d(
+            screenCoords.x / minecraftClient.getWindow().getScaleFactor(),
             (displayHeight - screenCoords.y) / minecraftClient.getWindow().getScaleFactor(), screenCoords.z);
     }
 
@@ -74,8 +75,8 @@ class RenderUtils
             startX + radiusCorner3, endY - radiusCorner3, radiusCorner3
         }
         };
-        BufferBuilder bufferBuilder = Tessellator.getInstance().getBuffer();
-        bufferBuilder.begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
+        BufferBuilder bufferBuilder = Tessellator.getInstance()
+            .begin(VertexFormat.DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
         for (int i = 0; i < 4; i++)
         {
             double[] currentCorner = corners[i];
@@ -86,7 +87,7 @@ class RenderUtils
                 float  dy      = (float) (Math.sin(radians) * radius);
                 float  dx      = (float) (Math.cos(radians) * radius);
                 bufferBuilder.vertex(matrixStack, (float) currentCorner[0] + dy, (float) currentCorner[1] + dx, 0.0F)
-                    .color(red, green, blue, alpha).next();
+                    .color(red, green, blue, alpha);
             }
         }
         BufferRenderer.drawWithGlobalProgram(bufferBuilder.end());
@@ -105,8 +106,7 @@ class RenderUtils
         float    b              = (float) (color & 255) / 255.0F;
         RenderUtils.setupRender();
         RenderSystem.setShader(GameRenderer::getPositionColorProgram);
-        RenderUtils.renderRoundedBox(positionMatrix, r, g, b, a, xStart, yStart, xEnd, yEnd, radiusCorner1,
-            radiusCorner2, radiusCorner3, radiusCorner4, samples);
+        RenderUtils.renderRoundedBox(positionMatrix, r, g, b, a, xStart, yStart, xEnd, yEnd, radiusCorner1, radiusCorner2, radiusCorner3, radiusCorner4, samples);
         RenderUtils.endRender();
     }
 
@@ -114,8 +114,7 @@ class RenderUtils
     void renderRoundedBox(MatrixStack matrixStack, RGBAColor rgbaColor, double xStart, double yStart, double xEnd,
                           double yEnd, double radius, int samples)
     {
-        RenderUtils.renderRoundedBox(matrixStack, rgbaColor, xStart, yStart, xEnd, yEnd, radius, radius, radius, radius,
-            samples);
+        RenderUtils.renderRoundedBox(matrixStack, rgbaColor, xStart, yStart, xEnd, yEnd, radius, radius, radius, radius, samples);
     }
 
 }
