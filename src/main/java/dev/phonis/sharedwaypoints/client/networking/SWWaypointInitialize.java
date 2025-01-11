@@ -6,28 +6,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public
-class SWWaypointInitialize implements SWPacket
+public class SWWaypointInitialize implements SWPacket
 {
 
     public final List<SWWaypoint> waypoints;
 
-    public
-    SWWaypointInitialize(List<SWWaypoint> waypoints)
+    public SWWaypointInitialize(List<SWWaypoint> waypoints)
     {
         this.waypoints = waypoints;
     }
 
     @Override
-    public
-    byte getID()
+    public byte getID()
     {
         return Packets.In.SWWaypointInitializeID;
     }
 
     @Override
-    public
-    void toBytes(DataOutputStream dos) throws IOException
+    public void toBytes(DataOutputStream dos) throws IOException
     {
         dos.writeInt(this.waypoints.size());
 
@@ -37,10 +33,9 @@ class SWWaypointInitialize implements SWPacket
         }
     }
 
-    public static
-    SWWaypointInitialize fromBytes(DataInputStream dis) throws IOException
+    public static SWWaypointInitialize fromBytes(DataInputStream dis) throws IOException
     {
-        int              length    = dis.readInt();
+        int length = dis.readInt();
         List<SWWaypoint> waypoints = new ArrayList<>(length);
 
         for (int i = 0; i < length; i++)

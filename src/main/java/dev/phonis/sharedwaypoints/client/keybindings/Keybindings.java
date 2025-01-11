@@ -9,28 +9,22 @@ import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import org.lwjgl.glfw.GLFW;
 
-public
-class Keybindings
+public class Keybindings
 {
 
-    private static final String     category                                  = "category.sharedwaypoints.sharedWaypoints";
-    public static final  KeyBinding openConfigScreenKeyBinding                = KeyBindingHelper.registerKeyBinding(
-        new KeyBinding("binding.sharedwaypoints.sWMenu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G, Keybindings.category));
-    public static final  KeyBinding toggleWaypointsKeyBinding                 = KeyBindingHelper.registerKeyBinding(
-        new KeyBinding("binding.sharedwaypoints.toggleWaypoints", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_N,
-            Keybindings.category));
-    public static final  KeyBinding toggleWaypointFullNamesKeyBinding         = KeyBindingHelper.registerKeyBinding(
-        new KeyBinding("binding.sharedwaypoints.toggleFullNames", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN,
-            Keybindings.category));
-    public static final  KeyBinding toggleHighlightClosestKeyBinding          = KeyBindingHelper.registerKeyBinding(
-        new KeyBinding("binding.sharedwaypoints.toggleClosestHighlight", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN,
-            Keybindings.category));
-    public static final  KeyBinding toggleCrossDimensionalWaypointsKeyBinding = KeyBindingHelper.registerKeyBinding(
-        new KeyBinding("binding.sharedwaypoints.toggleCrossDimensional", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN,
-            Keybindings.category));
+    private static final String category = "category.sharedwaypoints.sharedWaypoints";
+    public static final KeyBinding openConfigScreenKeyBinding
+        = KeyBindingHelper.registerKeyBinding(new KeyBinding("binding.sharedwaypoints.sWMenu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G, Keybindings.category));
+    public static final KeyBinding toggleWaypointsKeyBinding
+        = KeyBindingHelper.registerKeyBinding(new KeyBinding("binding.sharedwaypoints.toggleWaypoints", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_N, Keybindings.category));
+    public static final KeyBinding toggleWaypointFullNamesKeyBinding
+        = KeyBindingHelper.registerKeyBinding(new KeyBinding("binding.sharedwaypoints.toggleFullNames", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, Keybindings.category));
+    public static final KeyBinding toggleHighlightClosestKeyBinding
+        = KeyBindingHelper.registerKeyBinding(new KeyBinding("binding.sharedwaypoints.toggleClosestHighlight", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, Keybindings.category));
+    public static final KeyBinding toggleCrossDimensionalWaypointsKeyBinding
+        = KeyBindingHelper.registerKeyBinding(new KeyBinding("binding.sharedwaypoints.toggleCrossDimensional", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_UNKNOWN, Keybindings.category));
 
-    public static
-    void handle(MinecraftClient client)
+    public static void handle(MinecraftClient client)
     {
         boolean needToUpdateConfig = false;
 
@@ -42,7 +36,7 @@ class Keybindings
         while (Keybindings.toggleWaypointsKeyBinding.wasPressed())
         {
             SWConfig.INSTANCE.renderWaypoints = !SWConfig.INSTANCE.renderWaypoints;
-            needToUpdateConfig                = true;
+            needToUpdateConfig = true;
 
             if (!SWConfig.INSTANCE.renderWaypoints)
             {
@@ -53,19 +47,19 @@ class Keybindings
         while (Keybindings.toggleWaypointFullNamesKeyBinding.wasPressed())
         {
             SWConfig.INSTANCE.fullWaypointNames = !SWConfig.INSTANCE.fullWaypointNames;
-            needToUpdateConfig                  = true;
+            needToUpdateConfig = true;
         }
 
         while (Keybindings.toggleHighlightClosestKeyBinding.wasPressed())
         {
             SWConfig.INSTANCE.highlightClosest = !SWConfig.INSTANCE.highlightClosest;
-            needToUpdateConfig                 = true;
+            needToUpdateConfig = true;
         }
 
         while (Keybindings.toggleCrossDimensionalWaypointsKeyBinding.wasPressed())
         {
             SWConfig.INSTANCE.crossDimensionalWaypoints = !SWConfig.INSTANCE.crossDimensionalWaypoints;
-            needToUpdateConfig                          = true;
+            needToUpdateConfig = true;
         }
 
         if (needToUpdateConfig)

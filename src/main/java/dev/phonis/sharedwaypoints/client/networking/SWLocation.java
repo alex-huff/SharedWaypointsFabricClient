@@ -4,27 +4,24 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public
-class SWLocation implements SWSerializable
+public class SWLocation implements SWSerializable
 {
 
     public final SWDimension dimension;
-    public final double      x;
-    public final double      y;
-    public final double      z;
+    public final double x;
+    public final double y;
+    public final double z;
 
-    public
-    SWLocation(SWDimension dimension, double x, double y, double z)
+    public SWLocation(SWDimension dimension, double x, double y, double z)
     {
         this.dimension = dimension;
-        this.x         = x;
-        this.y         = y;
-        this.z         = z;
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     @Override
-    public
-    boolean equals(Object other)
+    public boolean equals(Object other)
     {
         if (other instanceof SWLocation otherLocation)
         {
@@ -36,8 +33,7 @@ class SWLocation implements SWSerializable
     }
 
     @Override
-    public
-    void toBytes(DataOutputStream dos) throws IOException
+    public void toBytes(DataOutputStream dos) throws IOException
     {
         dos.writeByte(this.dimension.ordinal());
         dos.writeDouble(this.x);
@@ -45,8 +41,7 @@ class SWLocation implements SWSerializable
         dos.writeDouble(this.z);
     }
 
-    public static
-    SWLocation fromBytes(DataInputStream dis) throws IOException
+    public static SWLocation fromBytes(DataInputStream dis) throws IOException
     {
         return new SWLocation(SWDimension.fromBytes(dis), dis.readDouble(), dis.readDouble(), dis.readDouble());
     }

@@ -8,6 +8,7 @@ import net.minecraft.client.render.DimensionEffects;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.client.util.Window;
+import net.minecraft.util.profiler.Profiler;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 import org.objectweb.asm.Opcodes;
@@ -20,17 +21,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 @Mixin(GameRenderer.class)
-public abstract
-class MixinGameRenderer
+public abstract class MixinGameRenderer
 {
 
     @Shadow
-    public abstract
-    MinecraftClient getClient();
+    public abstract MinecraftClient getClient();
 
     @Final
     @Shadow
-    MinecraftClient client;
+    private MinecraftClient client;
 
     @Inject(
         at = @At(
@@ -56,8 +55,8 @@ class MixinGameRenderer
     @Inject(
         at = @At(
             value = "INVOKE", target = "Lnet/minecraft/client/render/GameRenderer;renderFloatingItem(Lnet/minecraft/client/gui/DrawContext;F)V", shift = At.Shift.AFTER), method = "render", locals = LocalCapture.CAPTURE_FAILHARD)
-    void onHudRender(RenderTickCounter renderTickCounter, boolean tick, CallbackInfo ci, boolean bl, int i, int j,
-                     Window window, Matrix4f matrix4f, Matrix4fStack matrix4fStack, DrawContext drawContext)
+    void onHudRender(RenderTickCounter tickCounter, boolean tick, CallbackInfo ci, Profiler profiler, boolean bl, int i,
+                     int j, Window window, Matrix4f matrix4f, Matrix4fStack matrix4fStack, DrawContext drawContext)
     {
         WaypointRenderer.hudRenderTasks.forEach(consumer -> consumer.accept(drawContext));
     }

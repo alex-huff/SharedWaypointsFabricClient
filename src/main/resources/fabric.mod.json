@@ -4,49 +4,39 @@
   "version": "${version}",
   "name": "Shared Waypoints",
   "description": "The client mod for SharedWaypoints",
-  "authors":
-  [
+  "authors": [
     "phonis"
   ],
   "license": "CC0-1.0",
   "icon": "assets/rtsurvival/SW.png",
-  "contact":
-  {
+  "contact": {
     "sources": "https://github.com/alex-huff/SharedWaypointsFabricClient",
     "issues": "https://github.com/alex-huff/SharedWaypointsFabricClient/issues",
     "homepage": "https://github.com/alex-huff/SharedWaypointsFabricClient"
   },
   "environment": "client",
-  "entrypoints":
-  {
-    "client":
-    [
+  "entrypoints": {
+    "client": [
       "dev.phonis.sharedwaypoints.client.SharedWaypointsClient"
     ],
-    "modmenu":
-    [
+    "modmenu": [
       "dev.phonis.sharedwaypoints.client.gui.SWModMenuApiImpl"
     ]
   },
-  "mixins":
-  [
+  "mixins": [
     "sharedwaypoints-client.mixins.json"
   ],
-  "depends":
-  {
-    "fabricloader": ">=0.15.11",
+  "depends": {
+    "fabricloader": ">=0.16.9",
     "fabric": "*",
-    "minecraft": "~1.21",
+    "minecraft": "~1.21.4",
     "fabric-key-binding-api-v1": "*",
     "cloth-config2": ">=11.0.99",
     "java": ">=21"
   },
-  "custom":
-  {
-    "modmenu":
-    {
-      "links":
-      {
+  "custom": {
+    "modmenu": {
+      "links": {
         "github": "https://github.com/alex-huff/SharedWaypointsFabricClient"
       }
     },

@@ -10,31 +10,29 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 
-public
-class SWSurvivalReceiver implements ClientPlayNetworking.PlayPayloadHandler<SWPayload>
+public class SWSurvivalReceiver implements ClientPlayNetworking.PlayPayloadHandler<SWPayload>
 {
 
     public static SWSurvivalReceiver INSTANCE = new SWSurvivalReceiver();
 
     @Override
-    public
-    void receive(SWPayload payload, ClientPlayNetworking.Context context)
+    public void receive(SWPayload payload, ClientPlayNetworking.Context context)
     {
-        MinecraftClient client         = context.client();
-        PacketSender    responseSender = context.responseSender();
+        MinecraftClient client = context.client();
+        PacketSender responseSender = context.responseSender();
 
         try
         {
-            DataInputStream dis      = new DataInputStream(new ByteArrayInputStream(payload.bytes()));
-            byte            packetID = dis.readByte();
+            DataInputStream dis = new DataInputStream(new ByteArrayInputStream(payload.bytes()));
+            byte packetID = dis.readByte();
             SWPacket packet = switch (packetID)
-                {
-                    case Packets.In.SWUnsupportedID -> SWUnsupported.fromBytes(dis);
-                    case Packets.In.SWWaypointInitializeID -> SWWaypointInitialize.fromBytes(dis);
-                    case Packets.In.SWWaypointUpdateID -> SWWaypointUpdate.fromBytes(dis);
-                    case Packets.In.SWWaypointRemoveID -> SWWaypointRemove.fromBytes(dis);
-                    default -> null;
-                };
+            {
+                case Packets.In.SWUnsupportedID -> SWUnsupported.fromBytes(dis);
+                case Packets.In.SWWaypointInitializeID -> SWWaypointInitialize.fromBytes(dis);
+                case Packets.In.SWWaypointUpdateID -> SWWaypointUpdate.fromBytes(dis);
+                case Packets.In.SWWaypointRemoveID -> SWWaypointRemove.fromBytes(dis);
+                default -> null;
+            };
 
             dis.close();
             this.handlePacket(client, responseSender, packet);
@@ -45,8 +43,7 @@ class SWSurvivalReceiver implements ClientPlayNetworking.PlayPayloadHandler<SWPa
         }
     }
 
-    private
-    void handlePacket(MinecraftClient client, PacketSender responseSender, SWPacket packet)
+    private void handlePacket(MinecraftClient client, PacketSender responseSender, SWPacket packet)
     {
         if (packet instanceof SWUnsupported rtUnsupported)
         {
@@ -69,4 +66,5 @@ class SWSurvivalReceiver implements ClientPlayNetworking.PlayPayloadHandler<SWPa
             System.out.println("Unrecognised packet.");
         }
     }
+
 }

@@ -1,6 +1,7 @@
 package dev.phonis.sharedwaypoints.client.render;
 
 import dev.phonis.sharedwaypoints.client.config.SWConfig;
+import dev.phonis.sharedwaypoints.client.mixin.DrawContextAccessor;
 import dev.phonis.sharedwaypoints.client.networking.SWDimension;
 import dev.phonis.sharedwaypoints.client.networking.SWWaypoint;
 import dev.phonis.sharedwaypoints.client.state.SWStateManager;
@@ -10,7 +11,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.DimensionEffects;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
-import org.joml.Matrix4f;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -19,24 +19,22 @@ import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
-public
-class WaypointRenderer
+public class WaypointRenderer
 {
 
-    private
-    record RenderContext3D(Vec3d realLocation, Vec3d screenCoordinates, SWWaypoint waypoint)
+    private record RenderContext3D(Vec3d realLocation, Vec3d screenCoordinates, SWWaypoint waypoint)
     {
+
     }
 
-    private
-    record RenderContext2D(int distance, Vec2f pixelCoordinates, SWWaypoint waypoint)
+    private record RenderContext2D(int distance, Vec2f pixelCoordinates, SWWaypoint waypoint)
     {
+
     }
 
     public static final List<Consumer<DrawContext>> hudRenderTasks = new ArrayList<>();
 
-    private static
-    boolean shouldRender(SWWaypoint swWaypoint, DimensionEffects.SkyType currentDimension)
+    private static boolean shouldRender(SWWaypoint swWaypoint, DimensionEffects.SkyType currentDimension)
     {
         return (WaypointRenderer.compareDimension(swWaypoint.location.dimension, currentDimension)) ||
                (SWConfig.INSTANCE.crossDimensionalWaypoints &&
@@ -44,14 +42,13 @@ class WaypointRenderer
                  currentDimension.equals(DimensionEffects.SkyType.NONE)));
     }
 
-    public static
-    void renderWaypoints(DimensionEffects.SkyType currentDimension)
+    public static void renderWaypoints(DimensionEffects.SkyType currentDimension)
     {
-        MinecraftClient                              minecraftClient = MinecraftClient.getInstance();
-        int                                          screenWidth     = minecraftClient.getWindow().getScaledWidth();
-        int                                          screenHeight    = minecraftClient.getWindow().getScaledHeight();
-        Vec2f                                        screenMiddle    = new Vec2f(screenWidth / 2F, screenHeight / 2F);
-        final List<WaypointRenderer.RenderContext2D> toRender        = new ArrayList<>();
+        MinecraftClient minecraftClient = MinecraftClient.getInstance();
+        int screenWidth = minecraftClient.getWindow().getScaledWidth();
+        int screenHeight = minecraftClient.getWindow().getScaledHeight();
+        Vec2f screenMiddle = new Vec2f(screenWidth / 2F, screenHeight / 2F);
+        final List<WaypointRenderer.RenderContext2D> toRender = new ArrayList<>();
         SWStateManager.INSTANCE.withWaypoints((waypointState) -> waypointState.stream()
             .filter(waypoint -> WaypointRenderer.shouldRender(waypoint, currentDimension)).map(swWaypoint ->
             {
@@ -73,7 +70,7 @@ class WaypointRenderer
                     .distanceTo(minecraftClient.gameRenderer.getCamera().getPos());
                 return new WaypointRenderer.RenderContext2D(distance, pixelCoordinates, renderContext3D.waypoint());
             }).forEach(toRender::add));
-        if (toRender.size() == 0)
+        if (toRender.isEmpty())
         {
             return;
         }
@@ -89,24 +86,22 @@ class WaypointRenderer
         });
     }
 
-    private static
-    void drawWaypoint(DrawContext drawContext, RenderContext2D toRender, boolean highlighted)
+    private static void drawWaypoint(DrawContext drawContext, RenderContext2D toRender, boolean highlighted)
     {
         MinecraftClient minecraftClient = MinecraftClient.getInstance();
-        Vec2f           position        = toRender.pixelCoordinates();
-        SWWaypoint      waypoint        = toRender.waypoint();
-        TextRenderer    textRenderer    = minecraftClient.textRenderer;
+        Vec2f position = toRender.pixelCoordinates();
+        SWWaypoint waypoint = toRender.waypoint();
+        TextRenderer textRenderer = minecraftClient.textRenderer;
         String waypointLabel = (SWConfig.INSTANCE.fullWaypointNames || highlighted) ? waypoint.name
                                                                                     : waypoint.name.substring(0, 1)
                                    .toUpperCase(Locale.ROOT);
         float scale = SWConfig.INSTANCE.renderScale / 100F;
         // -1 on width and height to ignore shadow since it will not be used
-        float     waypointTextWidth  = textRenderer.getWidth(waypointLabel) - 1;
-        float     waypointTextHeight = textRenderer.fontHeight - 1;
-        float     padding            = waypointTextHeight * .2F;
-        RGBAColor textColor          = SWConfig.INSTANCE.textColor;
-        RGBAColor waypointColor      = highlighted ? SWConfig.INSTANCE.fullBackground
-                                                   : SWConfig.INSTANCE.plateBackground;
+        float waypointTextWidth = textRenderer.getWidth(waypointLabel) - 1;
+        float waypointTextHeight = textRenderer.fontHeight - 1;
+        float padding = waypointTextHeight * .2F;
+        RGBAColor textColor = SWConfig.INSTANCE.textColor;
+        RGBAColor waypointColor = highlighted ? SWConfig.INSTANCE.fullBackground : SWConfig.INSTANCE.plateBackground;
         drawContext.getMatrices().push();
         drawContext.getMatrices().translate(position.x, position.y, 0);
         drawContext.getMatrices().scale(scale, scale, 0);
@@ -117,15 +112,15 @@ class WaypointRenderer
         textRenderer.draw(waypointLabel,
             -waypointTextWidth / 2F,
             -waypointTextHeight / 2F, textColor.toInt(), false, drawContext.getMatrices().peek()
-                .getPositionMatrix(), drawContext.getVertexConsumers(), TextRenderer.TextLayerType.NORMAL, 0, 15728880);
+                .getPositionMatrix(), ((DrawContextAccessor) drawContext).getVertexConsumers(), TextRenderer.TextLayerType.NORMAL, 0, 15728880);
         drawContext.draw();
         if (highlighted)
         {
             drawContext.getMatrices().translate(0, waypointTextHeight + padding * 2, 0);
-            String    distanceLabel      = toRender.distance() + "m";
-            float     distanceTextWidth  = textRenderer.getWidth(distanceLabel) - 1;
-            float     distanceTextHeight = textRenderer.fontHeight - 1;
-            RGBAColor distanceColor      = SWConfig.INSTANCE.distanceBackground;
+            String distanceLabel = toRender.distance() + "m";
+            float distanceTextWidth = textRenderer.getWidth(distanceLabel) - 1;
+            float distanceTextHeight = textRenderer.fontHeight - 1;
+            RGBAColor distanceColor = SWConfig.INSTANCE.distanceBackground;
             RenderUtils.renderRoundedBox(drawContext.getMatrices(), distanceColor,
                 -distanceTextWidth / 2F - padding,
                 -distanceTextHeight / 2F - padding,
@@ -133,14 +128,13 @@ class WaypointRenderer
             textRenderer.draw(distanceLabel,
                 -distanceTextWidth / 2F,
                 -distanceTextHeight / 2F, textColor.toInt(), false, drawContext.getMatrices().peek()
-                    .getPositionMatrix(), drawContext.getVertexConsumers(), TextRenderer.TextLayerType.NORMAL, 0, 15728880);
+                    .getPositionMatrix(), ((DrawContextAccessor) drawContext).getVertexConsumers(), TextRenderer.TextLayerType.NORMAL, 0, 15728880);
             drawContext.draw();
         }
         drawContext.getMatrices().pop();
     }
 
-    private static
-    boolean compareDimension(SWDimension dimension, DimensionEffects.SkyType currentDimension)
+    private static boolean compareDimension(SWDimension dimension, DimensionEffects.SkyType currentDimension)
     {
         return (dimension == SWDimension.OVERWORLD && currentDimension.equals(DimensionEffects.SkyType.NORMAL)) ||
                (dimension == SWDimension.NETHER && currentDimension.equals(DimensionEffects.SkyType.NONE)) ||

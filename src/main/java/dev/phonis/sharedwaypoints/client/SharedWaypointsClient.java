@@ -13,22 +13,19 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.util.Identifier;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public
-class SharedWaypointsClient implements ClientModInitializer
+public class SharedWaypointsClient implements ClientModInitializer
 {
 
     public static final int protocolVersion = 1;
 
     @Override
-    public
-    void onInitializeClient()
+    public void onInitializeClient()
     {
         PayloadTypeRegistry.playC2S().register(SWPayload.id, SWPayload.codec);
         PayloadTypeRegistry.playS2C().register(SWPayload.id, SWPayload.codec);
@@ -60,31 +57,10 @@ class SharedWaypointsClient implements ClientModInitializer
         Keybindings.handle(MinecraftClient.getInstance()); // Force Keybindings class to be loaded
     }
 
-    public static
-    void sendPacket(SWPacket packet)
-    {
-        try
-        {
-            ClientPlayNetworkHandler handler = MinecraftClient.getInstance().getNetworkHandler();
-
-            if (handler == null)
-            {
-                return;
-            }
-
-            ClientPlayNetworking.send(new SWPayload(SharedWaypointsClient.packetToBytes(packet)));
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    private static
-    byte[] packetToBytes(SWPacket packet) throws IOException
+    private static byte[] packetToBytes(SWPacket packet) throws IOException
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        DataOutputStream      das  = new DataOutputStream(baos);
+        DataOutputStream das = new DataOutputStream(baos);
 
         das.writeByte(packet.getID());
         packet.toBytes(das);

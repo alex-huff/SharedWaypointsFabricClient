@@ -3,10 +3,10 @@
   "package": "dev.phonis.sharedwaypoints.client.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
-  "client":
-  [
+  "client": [
+    "DrawContextAccessor",
     "MixinGameRenderer",
-    "math.MixinMatrix4f"
+    "MixinMatrix4f"
   ],
   "injectors": {
     "defaultRequire": 1
