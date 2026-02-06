@@ -7,12 +7,13 @@ import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 public class Keybindings
 {
 
-    private static final String category = "category.sharedwaypoints.sharedWaypoints";
+    private static final KeyBinding.Category category = KeyBinding.Category.create(Identifier.of("waypoints"));
     public static final KeyBinding openConfigScreenKeyBinding
         = KeyBindingHelper.registerKeyBinding(new KeyBinding("binding.sharedwaypoints.sWMenu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G, Keybindings.category));
     public static final KeyBinding toggleWaypointsKeyBinding

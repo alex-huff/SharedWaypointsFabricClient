@@ -6,6 +6,7 @@ import dev.phonis.sharedwaypoints.client.networking.SWRegister;
 import dev.phonis.sharedwaypoints.client.networking.SWSurvivalReceiver;
 import dev.phonis.sharedwaypoints.client.networking.payload.SWPayload;
 import dev.phonis.sharedwaypoints.client.state.SWStateManager;
+import fi.dy.masa.malilib.event.InitializationHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.C2SPlayChannelEvents;
@@ -36,18 +37,20 @@ public class SharedWaypointsClient implements ClientModInitializer
             {
                 if (id.equals(SWPayload.id.id()))
                 {
-                    try
+                    if (Thread.currentThread().getName().equals("Render thread"))
                     {
-                        if (Thread.currentThread().getName().equals("Render thread"))
+                        minecraftClient.send(() ->
                         {
-                            clientPlayNetworkHandler.sendPacket(ClientPlayNetworking.createC2SPacket(new SWPayload(SharedWaypointsClient.packetToBytes(new SWRegister(SharedWaypointsClient.protocolVersion)))));
-                        }
+                            try
+                            {
+                                clientPlayNetworkHandler.sendPacket(ClientPlayNetworking.createC2SPacket(new SWPayload(SharedWaypointsClient.packetToBytes(new SWRegister(SharedWaypointsClient.protocolVersion)))));
+                            }
+                            catch (IOException e)
+                            {
+                                e.printStackTrace();
+                            }
+                        });
                     }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                    }
-
                     break;
                 }
             }
@@ -55,6 +58,7 @@ public class SharedWaypointsClient implements ClientModInitializer
         ClientPlayConnectionEvents.DISCONNECT.register((clientPlayNetworkHandler, minecraftClient) -> SWStateManager.INSTANCE.clearState());
         ClientTickEvents.END_CLIENT_TICK.register(Keybindings::handle);
         Keybindings.handle(MinecraftClient.getInstance()); // Force Keybindings class to be loaded
+        InitializationHandler.getInstance().registerInitializationHandler(new InitHandler());
     }
 
     private static byte[] packetToBytes(SWPacket packet) throws IOException

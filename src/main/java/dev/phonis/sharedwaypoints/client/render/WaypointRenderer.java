@@ -1,26 +1,52 @@
 package dev.phonis.sharedwaypoints.client.render;
 
 import dev.phonis.sharedwaypoints.client.config.SWConfig;
-import dev.phonis.sharedwaypoints.client.mixin.DrawContextAccessor;
+import dev.phonis.sharedwaypoints.client.math.Projector;
 import dev.phonis.sharedwaypoints.client.networking.SWDimension;
 import dev.phonis.sharedwaypoints.client.networking.SWWaypoint;
 import dev.phonis.sharedwaypoints.client.state.SWStateManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.DimensionEffects;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
+import org.joml.Matrix4f;
+import org.joml.Vector4f;
+import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
 
 public class WaypointRenderer
 {
+
+    public static boolean coordinateOnScreen(Vec3d position)
+    {
+        return position != null && position.z >= 0;
+    }
+
+    public static Vec3d worldSpaceToScreenSpace(Vec3d position, Matrix4f projectionMatrix, Matrix4f positionMatrix, Matrix4f modelViewMatrix, Camera camera)
+    {
+        MinecraftClient minecraftClient = MinecraftClient.getInstance();
+        double dx = position.x - camera.getPos().x;
+        double dy = position.y - camera.getPos().y;
+        double dz = position.z - camera.getPos().z;
+        Vector4f cameraDirection = new Vector4f((float) dx, (float) dy, (float) dz, 1F);
+        cameraDirection.mul(positionMatrix);
+        int[] viewport = new int[4];
+        GL11.glGetIntegerv(GL11.GL_VIEWPORT, viewport);
+        projectionMatrix = new Matrix4f(projectionMatrix);
+        projectionMatrix.mul(modelViewMatrix);
+        Vec3d screenCoords
+            = ((Projector) projectionMatrix).projectNonClampZ(cameraDirection.x(), cameraDirection.y(), cameraDirection.z(), viewport);
+        int displayHeight = minecraftClient.getWindow().getHeight();
+        return new Vec3d(
+            screenCoords.x / minecraftClient.getWindow().getScaleFactor(),
+            (displayHeight - screenCoords.y) / minecraftClient.getWindow().getScaleFactor(), screenCoords.z);
+    }
 
     private record RenderContext3D(Vec3d realLocation, Vec3d screenCoordinates, SWWaypoint waypoint)
     {
@@ -42,7 +68,7 @@ public class WaypointRenderer
                  currentDimension.equals(DimensionEffects.SkyType.NONE)));
     }
 
-    public static void renderWaypoints(DimensionEffects.SkyType currentDimension)
+    public static void renderWaypoints(DimensionEffects.SkyType currentDimension, Matrix4f projectionMatrix, Matrix4f positionMatrix, Matrix4f modelViewMatrix, Camera camera)
     {
         MinecraftClient minecraftClient = MinecraftClient.getInstance();
         int screenWidth = minecraftClient.getWindow().getScaledWidth();
@@ -59,9 +85,9 @@ public class WaypointRenderer
                     adjusted ? 128d : swWaypoint.location.y,
                     adjusted ? swWaypoint.location.z / 8d : swWaypoint.location.z);
                 Vec3d pixelCoordinates
-                    = RenderUtils.worldSpaceToScreenSpace(new Vec3d(adjustedLocation.x, adjustedLocation.y, adjustedLocation.z));
+                    = WaypointRenderer.worldSpaceToScreenSpace(new Vec3d(adjustedLocation.x, adjustedLocation.y, adjustedLocation.z), projectionMatrix, positionMatrix, modelViewMatrix, camera);
                 return new WaypointRenderer.RenderContext3D(adjustedLocation, pixelCoordinates, swWaypoint);
-            }).filter(renderContext3D -> RenderUtils.coordinateOnScreen(renderContext3D.screenCoordinates))
+            }).filter(renderContext3D -> WaypointRenderer.coordinateOnScreen(renderContext3D.screenCoordinates))
             .map(renderContext3D ->
             {
                 Vec2f pixelCoordinates
@@ -76,7 +102,7 @@ public class WaypointRenderer
         }
         toRender.sort(Comparator.comparing(renderContext2D -> renderContext2D.pixelCoordinates()
             .distanceSquared(screenMiddle), Comparator.reverseOrder()));
-        final WaypointRenderer.RenderContext2D closestWaypoint = toRender.get(toRender.size() - 1);
+        final WaypointRenderer.RenderContext2D closestWaypoint = toRender.getLast();
         WaypointRenderer.hudRenderTasks.add((drawContext) ->
         {
             SWStateManager.INSTANCE.setHoveredWaypoint(closestWaypoint.waypoint().name);
@@ -97,41 +123,31 @@ public class WaypointRenderer
                                    .toUpperCase(Locale.ROOT);
         float scale = SWConfig.INSTANCE.renderScale / 100F;
         // -1 on width and height to ignore shadow since it will not be used
-        float waypointTextWidth = textRenderer.getWidth(waypointLabel) - 1;
-        float waypointTextHeight = textRenderer.fontHeight - 1;
-        float padding = waypointTextHeight * .2F;
+        int waypointTextWidth = textRenderer.getWidth(waypointLabel) - 1;
+        int waypointTextHeight = textRenderer.fontHeight - 1;
+        int halfWaypointTextWidth = Math.round(waypointTextWidth / 2F);
+        int halfWaypointTextHeight = Math.round(waypointTextHeight / 2F);
+        int padding = Math.round(waypointTextHeight * .2F);
         RGBAColor textColor = SWConfig.INSTANCE.textColor;
         RGBAColor waypointColor = highlighted ? SWConfig.INSTANCE.fullBackground : SWConfig.INSTANCE.plateBackground;
-        drawContext.getMatrices().push();
-        drawContext.getMatrices().translate(position.x, position.y, 0);
-        drawContext.getMatrices().scale(scale, scale, 0);
-        RenderUtils.renderRoundedBox(drawContext.getMatrices(), waypointColor,
-            -waypointTextWidth / 2F - padding,
-            -waypointTextHeight / 2F - padding,
-            waypointTextWidth / 2F + padding, waypointTextHeight / 2F + padding, 3, 25);
-        textRenderer.draw(waypointLabel,
-            -waypointTextWidth / 2F,
-            -waypointTextHeight / 2F, textColor.toInt(), false, drawContext.getMatrices().peek()
-                .getPositionMatrix(), ((DrawContextAccessor) drawContext).getVertexConsumers(), TextRenderer.TextLayerType.NORMAL, 0, 15728880);
-        drawContext.draw();
+        drawContext.getMatrices().pushMatrix();
+        drawContext.getMatrices().translate(position.x, position.y);
+        drawContext.getMatrices().scale(scale, scale);
+        drawContext.fill(-halfWaypointTextWidth - padding, -halfWaypointTextHeight - padding, halfWaypointTextWidth + padding, halfWaypointTextHeight + padding, waypointColor.toInt());
+        drawContext.drawText(textRenderer, waypointLabel, -halfWaypointTextWidth, -halfWaypointTextHeight, textColor.toInt(), false);
         if (highlighted)
         {
-            drawContext.getMatrices().translate(0, waypointTextHeight + padding * 2, 0);
+            drawContext.getMatrices().translate(0, waypointTextHeight + padding * 2);
             String distanceLabel = toRender.distance() + "m";
-            float distanceTextWidth = textRenderer.getWidth(distanceLabel) - 1;
-            float distanceTextHeight = textRenderer.fontHeight - 1;
+            int distanceTextWidth = textRenderer.getWidth(distanceLabel) - 1;
+            int distanceTextHeight = textRenderer.fontHeight - 1;
+            int halfDistanceTextWidth = (int) Math.ceil(distanceTextWidth / 2F);
+            int halfDistanceTextHeight = (int) Math.ceil(distanceTextHeight / 2F);
             RGBAColor distanceColor = SWConfig.INSTANCE.distanceBackground;
-            RenderUtils.renderRoundedBox(drawContext.getMatrices(), distanceColor,
-                -distanceTextWidth / 2F - padding,
-                -distanceTextHeight / 2F - padding,
-                distanceTextWidth / 2F + padding, distanceTextHeight / 2F + padding, 3, 25);
-            textRenderer.draw(distanceLabel,
-                -distanceTextWidth / 2F,
-                -distanceTextHeight / 2F, textColor.toInt(), false, drawContext.getMatrices().peek()
-                    .getPositionMatrix(), ((DrawContextAccessor) drawContext).getVertexConsumers(), TextRenderer.TextLayerType.NORMAL, 0, 15728880);
-            drawContext.draw();
+            drawContext.fill(-halfDistanceTextWidth - padding, -halfDistanceTextHeight - padding, halfDistanceTextWidth + padding, halfDistanceTextHeight + padding, distanceColor.toInt());
+            drawContext.drawText(textRenderer, distanceLabel, -halfDistanceTextWidth, -halfDistanceTextHeight, textColor.toInt(), false);
         }
-        drawContext.getMatrices().pop();
+        drawContext.getMatrices().popMatrix();
     }
 
     private static boolean compareDimension(SWDimension dimension, DimensionEffects.SkyType currentDimension)
