@@ -5,6 +5,7 @@
   "binding.sharedwaypoints.toggleClosestHighlight": "Toggle Closest Waypoint Highlight",
   "binding.sharedwaypoints.toggleCrossDimensional": "Toggle Cross-Dimensional Waypoints",
   "title.sharedwaypoints.config": "SharedWaypoints Settings",
+  "key.category.sharedwaypoints.sharedwaypoints": "SharedWaypoints",
   "category.sharedwaypoints.waypoints": "Waypoints",
   "category.sharedwaypoints.sharedWaypoints": "SharedWaypoints",
   "category.sharedwaypoints.keybindings": "Keybindings",

@@ -13,7 +13,7 @@ import org.lwjgl.glfw.GLFW;
 public class Keybindings
 {
 
-    private static final KeyBinding.Category category = KeyBinding.Category.create(Identifier.of("waypoints"));
+    private static final KeyBinding.Category category = KeyBinding.Category.create(Identifier.of("sharedwaypoints:sharedwaypoints"));
     public static final KeyBinding openConfigScreenKeyBinding
         = KeyBindingHelper.registerKeyBinding(new KeyBinding("binding.sharedwaypoints.sWMenu", InputUtil.Type.KEYSYM, GLFW.GLFW_KEY_G, Keybindings.category));
     public static final KeyBinding toggleWaypointsKeyBinding
