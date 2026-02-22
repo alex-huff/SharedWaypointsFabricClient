@@ -5,13 +5,15 @@ import dev.phonis.sharedwaypoints.client.networking.SWPacket;
 import dev.phonis.sharedwaypoints.client.networking.SWRegister;
 import dev.phonis.sharedwaypoints.client.networking.SWSurvivalReceiver;
 import dev.phonis.sharedwaypoints.client.networking.payload.SWPayload;
+import dev.phonis.sharedwaypoints.client.render.WaypointRenderer;
 import dev.phonis.sharedwaypoints.client.state.SWStateManager;
-import fi.dy.masa.malilib.event.InitializationHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.C2SPlayChannelEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.Identifier;
@@ -24,6 +26,7 @@ public class SharedWaypointsClient implements ClientModInitializer
 {
 
     public static final int protocolVersion = 1;
+    public static final String MOD_ID = "sharedwaypoints-client-mod";
 
     @Override
     public void onInitializeClient()
@@ -58,7 +61,11 @@ public class SharedWaypointsClient implements ClientModInitializer
         ClientPlayConnectionEvents.DISCONNECT.register((clientPlayNetworkHandler, minecraftClient) -> SWStateManager.INSTANCE.clearState());
         ClientTickEvents.END_CLIENT_TICK.register(Keybindings::handle);
         Keybindings.handle(MinecraftClient.getInstance()); // Force Keybindings class to be loaded
-        InitializationHandler.getInstance().registerInitializationHandler(new InitHandler());
+        HudElementRegistry.attachElementBefore(
+            VanillaHudElements.CROSSHAIR,
+            Identifier.of(SharedWaypointsClient.MOD_ID, "waypoints"),
+            (drawContext, tickCounter) -> WaypointRenderer.hudRenderTasks.forEach(consumer -> consumer.accept(drawContext))
+        );
     }
 
     private static byte[] packetToBytes(SWPacket packet) throws IOException

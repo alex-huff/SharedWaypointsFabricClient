@@ -33,7 +33,6 @@
     "minecraft": "~1.21.10",
     "fabric-key-binding-api-v1": "*",
     "cloth-config2": ">=11.0.99",
-    "malilib": ">=0.26.4- <0.27.0-",
     "java": ">=21"
   },
   "custom": {

@@ -36,8 +36,7 @@ public class WaypointRenderer
         double dz = position.z - camera.getPos().z;
         Vector4f cameraDirection = new Vector4f((float) dx, (float) dy, (float) dz, 1F);
         cameraDirection.mul(positionMatrix);
-        int[] viewport = new int[4];
-        GL11.glGetIntegerv(GL11.GL_VIEWPORT, viewport);
+        int[] viewport = new int[]{ 0, 0, minecraftClient.getWindow().getFramebufferWidth(), minecraftClient.getWindow().getFramebufferHeight() };
         projectionMatrix = new Matrix4f(projectionMatrix);
         projectionMatrix.mul(modelViewMatrix);
         Vec3d screenCoords

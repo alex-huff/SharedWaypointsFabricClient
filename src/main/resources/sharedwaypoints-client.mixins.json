@@ -4,8 +4,8 @@
   "compatibilityLevel": "JAVA_21",
   "mixins": [],
   "client": [
-    "MixinGameRenderer",
-    "MixinMatrix4f"
+    "MixinMatrix4f",
+    "MixinGameRenderer"
   ],
   "injectors": {
     "defaultRequire": 1

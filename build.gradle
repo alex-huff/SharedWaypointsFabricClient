@@ -22,9 +22,6 @@ repositories {
 	// for more information about repositories.
 	maven { url "https://maven.shedaniel.me/" }
 	maven { url "https://maven.terraformersmc.com/releases/" }
-	maven {url = "https://masa.dy.fi/maven/sakura-ryoko"
-		content {includeGroupAndSubgroups("fi.dy.masa")}
-	}
 }
 
 dependencies {
@@ -43,8 +40,6 @@ dependencies {
 	}
 
 	modApi("com.terraformersmc:modmenu:7.1.0")
-
-	modImplementation "fi.dy.masa.malilib:malilib-fabric-${project.minecraft_version}:${project.malilib_version}"
 }
 
 processResources {
