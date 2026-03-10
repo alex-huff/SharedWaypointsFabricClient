@@ -41,10 +41,9 @@ public class WaypointRenderer
         projectionMatrix.mul(modelViewMatrix);
         Vec3d screenCoords
             = ((Projector) projectionMatrix).projectNonClampZ(cameraDirection.x(), cameraDirection.y(), cameraDirection.z(), viewport);
-        int displayHeight = minecraftClient.getWindow().getHeight();
-        return new Vec3d(
-            screenCoords.x / minecraftClient.getWindow().getScaleFactor(),
-            (displayHeight - screenCoords.y) / minecraftClient.getWindow().getScaleFactor(), screenCoords.z);
+        int displayHeight = minecraftClient.getWindow().getFramebufferHeight();
+        double scaleFactor = minecraftClient.getWindow().getScaleFactor();
+        return new Vec3d(screenCoords.x / scaleFactor, (displayHeight - screenCoords.y) / scaleFactor, screenCoords.z);
     }
 
     private record RenderContext3D(Vec3d realLocation, Vec3d screenCoordinates, SWWaypoint waypoint)
