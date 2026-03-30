@@ -5,6 +5,8 @@ import dev.phonis.sharedwaypoints.client.math.Projector;
 import dev.phonis.sharedwaypoints.client.networking.SWDimension;
 import dev.phonis.sharedwaypoints.client.networking.SWWaypoint;
 import dev.phonis.sharedwaypoints.client.state.SWStateManager;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.world.level.dimension.DimensionType;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
@@ -14,8 +16,6 @@ import java.util.stream.IntStream;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.DimensionSpecialEffects;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
@@ -30,9 +30,9 @@ public class WaypointRenderer
     public static Vec3 worldSpaceToScreenSpace(Vec3 position, Matrix4f projectionMatrix, Matrix4f positionMatrix, Matrix4f modelViewMatrix, Camera camera)
     {
         Minecraft minecraftClient = Minecraft.getInstance();
-        double dx = position.x - camera.getPosition().x;
-        double dy = position.y - camera.getPosition().y;
-        double dz = position.z - camera.getPosition().z;
+        double dx = position.x - camera.position().x;
+        double dy = position.y - camera.position().y;
+        double dz = position.z - camera.position().z;
         Vector4f cameraDirection = new Vector4f((float) dx, (float) dy, (float) dz, 1F);
         cameraDirection.mul(positionMatrix);
         int[] viewport = new int[]{ 0, 0, minecraftClient.getWindow().getWidth(), minecraftClient.getWindow().getHeight() };
@@ -55,17 +55,17 @@ public class WaypointRenderer
 
     }
 
-    public static final List<Consumer<GuiGraphics>> hudRenderTasks = new ArrayList<>();
+    public static final List<Consumer<GuiGraphicsExtractor>> hudRenderTasks = new ArrayList<>();
 
-    private static boolean shouldRender(SWWaypoint swWaypoint, DimensionSpecialEffects.SkyType currentDimension)
+    private static boolean shouldRender(SWWaypoint swWaypoint, DimensionType.Skybox currentDimension)
     {
         return (WaypointRenderer.compareDimension(swWaypoint.location.dimension, currentDimension)) ||
                (SWConfig.INSTANCE.crossDimensionalWaypoints &&
                 (swWaypoint.location.dimension == SWDimension.OVERWORLD &&
-                 currentDimension.equals(DimensionSpecialEffects.SkyType.NONE)));
+                 currentDimension.equals(DimensionType.Skybox.NONE)));
     }
 
-    public static void renderWaypoints(DimensionSpecialEffects.SkyType currentDimension, Matrix4f projectionMatrix, Matrix4f positionMatrix, Matrix4f modelViewMatrix, Camera camera)
+    public static void renderWaypoints(DimensionType.Skybox currentDimension, Matrix4f projectionMatrix, Matrix4f positionMatrix, Matrix4f modelViewMatrix, Camera camera)
     {
         Minecraft minecraftClient = Minecraft.getInstance();
         int screenWidth = minecraftClient.getWindow().getGuiScaledWidth();
@@ -76,7 +76,7 @@ public class WaypointRenderer
             .filter(waypoint -> WaypointRenderer.shouldRender(waypoint, currentDimension)).map(swWaypoint ->
             {
                 boolean adjusted = swWaypoint.location.dimension == SWDimension.OVERWORLD &&
-                                   currentDimension.equals(DimensionSpecialEffects.SkyType.NONE);
+                                   currentDimension.equals(DimensionType.Skybox.NONE);
                 Vec3 adjustedLocation = new Vec3(
                     adjusted ? swWaypoint.location.x / 8d : swWaypoint.location.x,
                     adjusted ? 128d : swWaypoint.location.y,
@@ -90,7 +90,7 @@ public class WaypointRenderer
                 Vec2 pixelCoordinates
                     = new Vec2((float) renderContext3D.screenCoordinates().x, (float) renderContext3D.screenCoordinates().y);
                 int distance = (int) renderContext3D.realLocation()
-                    .distanceTo(minecraftClient.gameRenderer.getMainCamera().getPosition());
+                    .distanceTo(minecraftClient.gameRenderer.getMainCamera().position());
                 return new WaypointRenderer.RenderContext2D(distance, pixelCoordinates, renderContext3D.waypoint());
             }).forEach(toRender::add));
         if (toRender.isEmpty())
@@ -109,7 +109,7 @@ public class WaypointRenderer
         });
     }
 
-    private static void drawWaypoint(GuiGraphics drawContext, RenderContext2D toRender, boolean highlighted)
+    private static void drawWaypoint(GuiGraphicsExtractor drawContext, RenderContext2D toRender, boolean highlighted)
     {
         Minecraft minecraftClient = Minecraft.getInstance();
         Vec2 position = toRender.pixelCoordinates();
@@ -131,7 +131,7 @@ public class WaypointRenderer
         drawContext.pose().translate(position.x, position.y);
         drawContext.pose().scale(scale, scale);
         drawContext.fill(-halfWaypointTextWidth - padding, -halfWaypointTextHeight - padding, halfWaypointTextWidth + padding, halfWaypointTextHeight + padding, waypointColor.toInt());
-        drawContext.drawString(textRenderer, waypointLabel, -halfWaypointTextWidth, -halfWaypointTextHeight, textColor.toInt(), false);
+        drawContext.text(textRenderer, waypointLabel, -halfWaypointTextWidth, -halfWaypointTextHeight, textColor.toInt(), false);
         if (highlighted)
         {
             drawContext.pose().translate(0, waypointTextHeight + padding * 2);
@@ -142,16 +142,16 @@ public class WaypointRenderer
             int halfDistanceTextHeight = (int) Math.ceil(distanceTextHeight / 2F);
             RGBAColor distanceColor = SWConfig.INSTANCE.distanceBackground;
             drawContext.fill(-halfDistanceTextWidth - padding, -halfDistanceTextHeight - padding, halfDistanceTextWidth + padding, halfDistanceTextHeight + padding, distanceColor.toInt());
-            drawContext.drawString(textRenderer, distanceLabel, -halfDistanceTextWidth, -halfDistanceTextHeight, textColor.toInt(), false);
+            drawContext.text(textRenderer, distanceLabel, -halfDistanceTextWidth, -halfDistanceTextHeight, textColor.toInt(), false);
         }
         drawContext.pose().popMatrix();
     }
 
-    private static boolean compareDimension(SWDimension dimension, DimensionSpecialEffects.SkyType currentDimension)
+    private static boolean compareDimension(SWDimension dimension, DimensionType.Skybox currentDimension)
     {
-        return (dimension == SWDimension.OVERWORLD && currentDimension.equals(DimensionSpecialEffects.SkyType.OVERWORLD)) ||
-               (dimension == SWDimension.NETHER && currentDimension.equals(DimensionSpecialEffects.SkyType.NONE)) ||
-               (dimension == SWDimension.END && currentDimension.equals(DimensionSpecialEffects.SkyType.END));
+        return (dimension == SWDimension.OVERWORLD && currentDimension.equals(DimensionType.Skybox.OVERWORLD)) ||
+               (dimension == SWDimension.NETHER && currentDimension.equals(DimensionType.Skybox.NONE)) ||
+               (dimension == SWDimension.END && currentDimension.equals(DimensionType.Skybox.END));
     }
 
 }

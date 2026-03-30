@@ -7,7 +7,7 @@ import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.gui.entries.KeyCodeEntry;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
-import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -178,7 +178,7 @@ public class ConfigScreen
     private static KeyCodeEntry getKeybindingOption(ConfigEntryBuilder entryBuilder, KeyMapping keyBinding,
                                                     TranslatableContents translationKey)
     {
-        return entryBuilder.startKeyCodeField(MutableComponent.create(translationKey), KeyBindingHelper.getBoundKeyOf(keyBinding))
+        return entryBuilder.startKeyCodeField(MutableComponent.create(translationKey), KeyMappingHelper.getBoundKeyOf(keyBinding))
             .setDefaultValue(keyBinding.getDefaultKey()).setKeySaveConsumer((code) ->
             {
                 keyBinding.setKey(code);
