@@ -4,8 +4,7 @@ import dev.phonis.sharedwaypoints.client.networking.payload.SWPayload;
 import dev.phonis.sharedwaypoints.client.state.SWStateManager;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.minecraft.client.MinecraftClient;
-
+import net.minecraft.client.Minecraft;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -18,7 +17,7 @@ public class SWSurvivalReceiver implements ClientPlayNetworking.PlayPayloadHandl
     @Override
     public void receive(SWPayload payload, ClientPlayNetworking.Context context)
     {
-        MinecraftClient client = context.client();
+        Minecraft client = context.client();
         PacketSender responseSender = context.responseSender();
 
         try
@@ -43,7 +42,7 @@ public class SWSurvivalReceiver implements ClientPlayNetworking.PlayPayloadHandl
         }
     }
 
-    private void handlePacket(MinecraftClient client, PacketSender responseSender, SWPacket packet)
+    private void handlePacket(Minecraft client, PacketSender responseSender, SWPacket packet)
     {
         if (packet instanceof SWUnsupported rtUnsupported)
         {

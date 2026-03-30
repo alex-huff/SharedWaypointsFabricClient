@@ -4,11 +4,11 @@ import com.llamalad7.mixinextras.sugar.Local;
 import com.mojang.blaze3d.systems.RenderSystem;
 import dev.phonis.sharedwaypoints.client.config.SWConfig;
 import dev.phonis.sharedwaypoints.client.render.WaypointRenderer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.DimensionEffects;
-import net.minecraft.client.render.GameRenderer;
-import net.minecraft.client.render.RenderTickCounter;
+import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.DimensionSpecialEffects;
+import net.minecraft.client.renderer.GameRenderer;
 import org.joml.Matrix4f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -20,13 +20,13 @@ public class MixinGameRenderer
 {
 
     @Inject(
-        method = "renderWorld(Lnet/minecraft/client/render/RenderTickCounter;)V",
+        method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/render/WorldRenderer;render(Lnet/minecraft/client/util/ObjectAllocator;Lnet/minecraft/client/render/RenderTickCounter;ZLnet/minecraft/client/render/Camera;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;Z)V", shift = At.Shift.BEFORE
+            target = "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/Camera;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;Z)V", shift = At.Shift.BEFORE
         )
     )
-    public void onWorldRender(RenderTickCounter renderTickCounter, CallbackInfo ci, @Local(ordinal = 0) Matrix4f matrix4f,
+    public void onWorldRender(DeltaTracker renderTickCounter, CallbackInfo ci, @Local(ordinal = 0) Matrix4f matrix4f,
                               @Local(ordinal = 1) Matrix4f matrix4f2)
     {
         Matrix4f projectionMatrix = matrix4f;
@@ -35,15 +35,15 @@ public class MixinGameRenderer
 
         // Clear any hudRenderTasks from last tick.
         WaypointRenderer.hudRenderTasks.clear();
-        MinecraftClient minecraftClient = MinecraftClient.getInstance();
-        Camera camera = minecraftClient.gameRenderer.getCamera();
+        Minecraft minecraftClient = Minecraft.getInstance();
+        Camera camera = minecraftClient.gameRenderer.getMainCamera();
 
-        if (minecraftClient.world == null)
+        if (minecraftClient.level == null)
         {
             return;
         }
 
-        DimensionEffects.SkyType currentDimension = minecraftClient.world.getDimensionEffects().getSkyType();
+        DimensionSpecialEffects.SkyType currentDimension = minecraftClient.level.effects().skyType();
 
         if (SWConfig.INSTANCE.renderWaypoints)
         {

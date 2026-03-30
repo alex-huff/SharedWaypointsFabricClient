@@ -15,9 +15,8 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -36,17 +35,17 @@ public class SharedWaypointsClient implements ClientModInitializer
         ClientPlayNetworking.registerGlobalReceiver(SWPayload.id, SWSurvivalReceiver.INSTANCE);
         C2SPlayChannelEvents.REGISTER.register((clientPlayNetworkHandler, packetSender, minecraftClient, ids) ->
         {
-            for (Identifier id : ids)
+            for (ResourceLocation id : ids)
             {
                 if (id.equals(SWPayload.id.id()))
                 {
                     if (Thread.currentThread().getName().equals("Render thread"))
                     {
-                        minecraftClient.send(() ->
+                        minecraftClient.schedule(() ->
                         {
                             try
                             {
-                                clientPlayNetworkHandler.sendPacket(ClientPlayNetworking.createC2SPacket(new SWPayload(SharedWaypointsClient.packetToBytes(new SWRegister(SharedWaypointsClient.protocolVersion)))));
+                                clientPlayNetworkHandler.send(ClientPlayNetworking.createC2SPacket(new SWPayload(SharedWaypointsClient.packetToBytes(new SWRegister(SharedWaypointsClient.protocolVersion)))));
                             }
                             catch (IOException e)
                             {
@@ -60,10 +59,10 @@ public class SharedWaypointsClient implements ClientModInitializer
         });
         ClientPlayConnectionEvents.DISCONNECT.register((clientPlayNetworkHandler, minecraftClient) -> SWStateManager.INSTANCE.clearState());
         ClientTickEvents.END_CLIENT_TICK.register(Keybindings::handle);
-        Keybindings.handle(MinecraftClient.getInstance()); // Force Keybindings class to be loaded
+        Keybindings.handle(Minecraft.getInstance()); // Force Keybindings class to be loaded
         HudElementRegistry.attachElementBefore(
             VanillaHudElements.CROSSHAIR,
-            Identifier.of(SharedWaypointsClient.MOD_ID, "waypoints"),
+            ResourceLocation.fromNamespaceAndPath(SharedWaypointsClient.MOD_ID, "waypoints"),
             (drawContext, tickCounter) -> WaypointRenderer.hudRenderTasks.forEach(consumer -> consumer.accept(drawContext))
         );
     }

@@ -8,150 +8,150 @@ import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.gui.entries.KeyCodeEntry;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.TranslatableTextContent;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.TranslatableContents;
 
 public class ConfigScreen
 {
 
-    private static final TranslatableTextContent configTitle
-        = new TranslatableTextContent("title.sharedwaypoints.config", null, null);
-    private static final TranslatableTextContent waypointCategoryName
-        = new TranslatableTextContent("category.sharedwaypoints.waypoints", null, null);
-    private static final TranslatableTextContent toggleWaypointsOption
-        = new TranslatableTextContent("option.sharedwaypoints.toggleWaypoints", null, null);
-    private static final TranslatableTextContent toggleWaypointsTooltip
-        = new TranslatableTextContent("tooltip.sharedwaypoints.toggleWaypoints", null, null);
-    private static final TranslatableTextContent fullWaypointNamesOption
-        = new TranslatableTextContent("option.sharedwaypoints.fullWaypointNames", null, null);
-    private static final TranslatableTextContent fullWaypointNamesTooltip
-        = new TranslatableTextContent("tooltip.sharedwaypoints.fullWaypointNames", null, null);
-    private static final TranslatableTextContent highlightHoveredWaypointOption
-        = new TranslatableTextContent("option.sharedwaypoints.highlightHoveredWaypoint", null, null);
-    private static final TranslatableTextContent highlightHoveredWaypointTooltip
-        = new TranslatableTextContent("tooltip.sharedwaypoints.highlightHoveredWaypoint", null, null);
-    private static final TranslatableTextContent crossDimensionalWaypointsOption
-        = new TranslatableTextContent("option.sharedwaypoints.crossDimensionalWaypoints", null, null);
-    private static final TranslatableTextContent crossDimensionalWaypointsTooltip
-        = new TranslatableTextContent("tooltip.sharedwaypoints.crossDimensionalWaypoints", null, null);
-    private static final TranslatableTextContent renderScaleOption
-        = new TranslatableTextContent("option.sharedwaypoints.renderScale", null, null);
-    private static final TranslatableTextContent renderScaleTooltip
-        = new TranslatableTextContent("tooltip.sharedwaypoints.renderScale", null, null);
-    private static final TranslatableTextContent waypointColorOption
-        = new TranslatableTextContent("option.sharedwaypoints.waypointColor", null, null);
-    private static final TranslatableTextContent waypointColorTooltip
-        = new TranslatableTextContent("tooltip.sharedwaypoints.waypointColor", null, null);
-    private static final TranslatableTextContent waypointTransparencyOption
-        = new TranslatableTextContent("option.sharedwaypoints.waypointTransparency", null, null);
-    private static final TranslatableTextContent waypointTransparencyTooltip
-        = new TranslatableTextContent("tooltip.sharedwaypoints.waypointTransparency", null, null);
-    private static final TranslatableTextContent highlightWaypointColorOption
-        = new TranslatableTextContent("option.sharedwaypoints.highlightWaypointColor", null, null);
-    private static final TranslatableTextContent highlightWaypointColorTooltip
-        = new TranslatableTextContent("tooltip.sharedwaypoints.highlightWaypointColor", null, null);
-    private static final TranslatableTextContent highlightWaypointTransparencyOption
-        = new TranslatableTextContent("option.sharedwaypoints.highlightWaypointTransparency", null, null);
-    private static final TranslatableTextContent highlightWaypointTransparencyTooltip
-        = new TranslatableTextContent("tooltip.sharedwaypoints.highlightWaypointTransparency", null, null);
-    private static final TranslatableTextContent distanceBackgroundColorOption
-        = new TranslatableTextContent("option.sharedwaypoints.distanceBackgroundColor", null, null);
-    private static final TranslatableTextContent distanceBackgroundColorTooltip
-        = new TranslatableTextContent("tooltip.sharedwaypoints.distanceBackgroundColor", null, null);
-    private static final TranslatableTextContent distanceBackgroundTransparencyOption
-        = new TranslatableTextContent("option.sharedwaypoints.distanceBackgroundTransparency", null, null);
-    private static final TranslatableTextContent distanceBackgroundTransparencyTooltip
-        = new TranslatableTextContent("tooltip.sharedwaypoints.distanceBackgroundTransparency", null, null);
-    private static final TranslatableTextContent textColorOption
-        = new TranslatableTextContent("option.sharedwaypoints.textColor", null, null);
-    private static final TranslatableTextContent textColorTooltip
-        = new TranslatableTextContent("tooltip.sharedwaypoints.textColor", null, null);
-    private static final TranslatableTextContent keybindingsCategoryName
-        = new TranslatableTextContent("category.sharedwaypoints.keybindings", null, null);
-    private static final TranslatableTextContent sWMenuBindingName
-        = new TranslatableTextContent("binding.sharedwaypoints.sWMenu", null, null);
-    private static final TranslatableTextContent toggleWaypointsBindingName
-        = new TranslatableTextContent("binding.sharedwaypoints.toggleWaypoints", null, null);
-    private static final TranslatableTextContent toggleFullNamesBindingName
-        = new TranslatableTextContent("binding.sharedwaypoints.toggleFullNames", null, null);
-    private static final TranslatableTextContent toggleHighlightClosestBindingName
-        = new TranslatableTextContent("binding.sharedwaypoints.toggleClosestHighlight", null, null);
-    private static final TranslatableTextContent toggleCrossDimensionalBindingName
-        = new TranslatableTextContent("binding.sharedwaypoints.toggleCrossDimensional", null, null);
+    private static final TranslatableContents configTitle
+        = new TranslatableContents("title.sharedwaypoints.config", null, null);
+    private static final TranslatableContents waypointCategoryName
+        = new TranslatableContents("category.sharedwaypoints.waypoints", null, null);
+    private static final TranslatableContents toggleWaypointsOption
+        = new TranslatableContents("option.sharedwaypoints.toggleWaypoints", null, null);
+    private static final TranslatableContents toggleWaypointsTooltip
+        = new TranslatableContents("tooltip.sharedwaypoints.toggleWaypoints", null, null);
+    private static final TranslatableContents fullWaypointNamesOption
+        = new TranslatableContents("option.sharedwaypoints.fullWaypointNames", null, null);
+    private static final TranslatableContents fullWaypointNamesTooltip
+        = new TranslatableContents("tooltip.sharedwaypoints.fullWaypointNames", null, null);
+    private static final TranslatableContents highlightHoveredWaypointOption
+        = new TranslatableContents("option.sharedwaypoints.highlightHoveredWaypoint", null, null);
+    private static final TranslatableContents highlightHoveredWaypointTooltip
+        = new TranslatableContents("tooltip.sharedwaypoints.highlightHoveredWaypoint", null, null);
+    private static final TranslatableContents crossDimensionalWaypointsOption
+        = new TranslatableContents("option.sharedwaypoints.crossDimensionalWaypoints", null, null);
+    private static final TranslatableContents crossDimensionalWaypointsTooltip
+        = new TranslatableContents("tooltip.sharedwaypoints.crossDimensionalWaypoints", null, null);
+    private static final TranslatableContents renderScaleOption
+        = new TranslatableContents("option.sharedwaypoints.renderScale", null, null);
+    private static final TranslatableContents renderScaleTooltip
+        = new TranslatableContents("tooltip.sharedwaypoints.renderScale", null, null);
+    private static final TranslatableContents waypointColorOption
+        = new TranslatableContents("option.sharedwaypoints.waypointColor", null, null);
+    private static final TranslatableContents waypointColorTooltip
+        = new TranslatableContents("tooltip.sharedwaypoints.waypointColor", null, null);
+    private static final TranslatableContents waypointTransparencyOption
+        = new TranslatableContents("option.sharedwaypoints.waypointTransparency", null, null);
+    private static final TranslatableContents waypointTransparencyTooltip
+        = new TranslatableContents("tooltip.sharedwaypoints.waypointTransparency", null, null);
+    private static final TranslatableContents highlightWaypointColorOption
+        = new TranslatableContents("option.sharedwaypoints.highlightWaypointColor", null, null);
+    private static final TranslatableContents highlightWaypointColorTooltip
+        = new TranslatableContents("tooltip.sharedwaypoints.highlightWaypointColor", null, null);
+    private static final TranslatableContents highlightWaypointTransparencyOption
+        = new TranslatableContents("option.sharedwaypoints.highlightWaypointTransparency", null, null);
+    private static final TranslatableContents highlightWaypointTransparencyTooltip
+        = new TranslatableContents("tooltip.sharedwaypoints.highlightWaypointTransparency", null, null);
+    private static final TranslatableContents distanceBackgroundColorOption
+        = new TranslatableContents("option.sharedwaypoints.distanceBackgroundColor", null, null);
+    private static final TranslatableContents distanceBackgroundColorTooltip
+        = new TranslatableContents("tooltip.sharedwaypoints.distanceBackgroundColor", null, null);
+    private static final TranslatableContents distanceBackgroundTransparencyOption
+        = new TranslatableContents("option.sharedwaypoints.distanceBackgroundTransparency", null, null);
+    private static final TranslatableContents distanceBackgroundTransparencyTooltip
+        = new TranslatableContents("tooltip.sharedwaypoints.distanceBackgroundTransparency", null, null);
+    private static final TranslatableContents textColorOption
+        = new TranslatableContents("option.sharedwaypoints.textColor", null, null);
+    private static final TranslatableContents textColorTooltip
+        = new TranslatableContents("tooltip.sharedwaypoints.textColor", null, null);
+    private static final TranslatableContents keybindingsCategoryName
+        = new TranslatableContents("category.sharedwaypoints.keybindings", null, null);
+    private static final TranslatableContents sWMenuBindingName
+        = new TranslatableContents("binding.sharedwaypoints.sWMenu", null, null);
+    private static final TranslatableContents toggleWaypointsBindingName
+        = new TranslatableContents("binding.sharedwaypoints.toggleWaypoints", null, null);
+    private static final TranslatableContents toggleFullNamesBindingName
+        = new TranslatableContents("binding.sharedwaypoints.toggleFullNames", null, null);
+    private static final TranslatableContents toggleHighlightClosestBindingName
+        = new TranslatableContents("binding.sharedwaypoints.toggleClosestHighlight", null, null);
+    private static final TranslatableContents toggleCrossDimensionalBindingName
+        = new TranslatableContents("binding.sharedwaypoints.toggleCrossDimensional", null, null);
 
     public static Screen getConfigScreen(Screen parent)
     {
         ConfigBuilder builder = ConfigBuilder.create().setParentScreen(parent).setTransparentBackground(true)
-            .setTitle(MutableText.of(ConfigScreen.configTitle));
+            .setTitle(MutableComponent.create(ConfigScreen.configTitle));
         builder.setSavingRunnable(SWConfig::trySave);
 
         ConfigEntryBuilder entryBuilder = builder.entryBuilder();
-        ConfigCategory category = builder.getOrCreateCategory(MutableText.of(ConfigScreen.waypointCategoryName));
+        ConfigCategory category = builder.getOrCreateCategory(MutableComponent.create(ConfigScreen.waypointCategoryName));
 
-        category.addEntry(entryBuilder.startBooleanToggle(MutableText.of(ConfigScreen.toggleWaypointsOption), SWConfig.INSTANCE.renderWaypoints)
+        category.addEntry(entryBuilder.startBooleanToggle(MutableComponent.create(ConfigScreen.toggleWaypointsOption), SWConfig.INSTANCE.renderWaypoints)
             .setDefaultValue(SWConfig.defaultRenderWaypoints)
-            .setTooltip(MutableText.of(ConfigScreen.toggleWaypointsTooltip))
+            .setTooltip(MutableComponent.create(ConfigScreen.toggleWaypointsTooltip))
             .setSaveConsumer(newValue -> SWConfig.INSTANCE.renderWaypoints = newValue).build());
 
-        category.addEntry(entryBuilder.startBooleanToggle(MutableText.of(ConfigScreen.fullWaypointNamesOption), SWConfig.INSTANCE.fullWaypointNames)
+        category.addEntry(entryBuilder.startBooleanToggle(MutableComponent.create(ConfigScreen.fullWaypointNamesOption), SWConfig.INSTANCE.fullWaypointNames)
             .setDefaultValue(SWConfig.defaultFullWaypointNames)
-            .setTooltip(MutableText.of(ConfigScreen.fullWaypointNamesTooltip))
+            .setTooltip(MutableComponent.create(ConfigScreen.fullWaypointNamesTooltip))
             .setSaveConsumer(newValue -> SWConfig.INSTANCE.fullWaypointNames = newValue).build());
 
-        category.addEntry(entryBuilder.startBooleanToggle(MutableText.of(ConfigScreen.highlightHoveredWaypointOption), SWConfig.INSTANCE.highlightClosest)
+        category.addEntry(entryBuilder.startBooleanToggle(MutableComponent.create(ConfigScreen.highlightHoveredWaypointOption), SWConfig.INSTANCE.highlightClosest)
             .setDefaultValue(SWConfig.defaultHighlightClosest)
-            .setTooltip(MutableText.of(ConfigScreen.highlightHoveredWaypointTooltip))
+            .setTooltip(MutableComponent.create(ConfigScreen.highlightHoveredWaypointTooltip))
             .setSaveConsumer(newValue -> SWConfig.INSTANCE.highlightClosest = newValue).build());
 
-        category.addEntry(entryBuilder.startBooleanToggle(MutableText.of(ConfigScreen.crossDimensionalWaypointsOption), SWConfig.INSTANCE.crossDimensionalWaypoints)
+        category.addEntry(entryBuilder.startBooleanToggle(MutableComponent.create(ConfigScreen.crossDimensionalWaypointsOption), SWConfig.INSTANCE.crossDimensionalWaypoints)
             .setDefaultValue(SWConfig.defaultCrossDimensionalWaypoints)
-            .setTooltip(MutableText.of(ConfigScreen.crossDimensionalWaypointsTooltip))
+            .setTooltip(MutableComponent.create(ConfigScreen.crossDimensionalWaypointsTooltip))
             .setSaveConsumer(newValue -> SWConfig.INSTANCE.crossDimensionalWaypoints = newValue).build());
 
-        category.addEntry(entryBuilder.startIntSlider(MutableText.of(ConfigScreen.renderScaleOption), SWConfig.INSTANCE.renderScale, 0, 100)
-            .setDefaultValue(SWConfig.defaultRenderScale).setTooltip(MutableText.of(ConfigScreen.renderScaleTooltip))
+        category.addEntry(entryBuilder.startIntSlider(MutableComponent.create(ConfigScreen.renderScaleOption), SWConfig.INSTANCE.renderScale, 0, 100)
+            .setDefaultValue(SWConfig.defaultRenderScale).setTooltip(MutableComponent.create(ConfigScreen.renderScaleTooltip))
             .setSaveConsumer((value) -> SWConfig.INSTANCE.renderScale = value).build());
 
-        category.addEntry(entryBuilder.startColorField(MutableText.of(ConfigScreen.waypointColorOption), SWConfig.INSTANCE.plateBackground.toSheDanielColor())
+        category.addEntry(entryBuilder.startColorField(MutableComponent.create(ConfigScreen.waypointColorOption), SWConfig.INSTANCE.plateBackground.toSheDanielColor())
             .setDefaultValue(SWConfig.defaultPlateBackground.toInt() & 0x00FFFFFF)
-            .setTooltip(MutableText.of(ConfigScreen.waypointColorTooltip))
+            .setTooltip(MutableComponent.create(ConfigScreen.waypointColorTooltip))
             .setSaveConsumer2(SWConfig.INSTANCE.plateBackground::updateRGB).build());
 
-        category.addEntry(entryBuilder.startIntSlider(MutableText.of(ConfigScreen.waypointTransparencyOption), SWConfig.INSTANCE.plateBackground.a, 0, 255)
+        category.addEntry(entryBuilder.startIntSlider(MutableComponent.create(ConfigScreen.waypointTransparencyOption), SWConfig.INSTANCE.plateBackground.a, 0, 255)
             .setDefaultValue(SWConfig.defaultPlateBackground.a)
-            .setTooltip(MutableText.of(ConfigScreen.waypointTransparencyTooltip))
+            .setTooltip(MutableComponent.create(ConfigScreen.waypointTransparencyTooltip))
             .setSaveConsumer(SWConfig.INSTANCE.plateBackground::updateA).build());
 
-        category.addEntry(entryBuilder.startColorField(MutableText.of(ConfigScreen.highlightWaypointColorOption), SWConfig.INSTANCE.fullBackground.toSheDanielColor())
+        category.addEntry(entryBuilder.startColorField(MutableComponent.create(ConfigScreen.highlightWaypointColorOption), SWConfig.INSTANCE.fullBackground.toSheDanielColor())
             .setDefaultValue(SWConfig.defaultFullBackground.toInt() & 0x00FFFFFF)
-            .setTooltip(MutableText.of(ConfigScreen.highlightWaypointColorTooltip))
+            .setTooltip(MutableComponent.create(ConfigScreen.highlightWaypointColorTooltip))
             .setSaveConsumer2(SWConfig.INSTANCE.fullBackground::updateRGB).build());
 
-        category.addEntry(entryBuilder.startIntSlider(MutableText.of(ConfigScreen.highlightWaypointTransparencyOption), SWConfig.INSTANCE.fullBackground.a, 0, 255)
+        category.addEntry(entryBuilder.startIntSlider(MutableComponent.create(ConfigScreen.highlightWaypointTransparencyOption), SWConfig.INSTANCE.fullBackground.a, 0, 255)
             .setDefaultValue(SWConfig.defaultFullBackground.a)
-            .setTooltip(MutableText.of(ConfigScreen.highlightWaypointTransparencyTooltip))
+            .setTooltip(MutableComponent.create(ConfigScreen.highlightWaypointTransparencyTooltip))
             .setSaveConsumer(SWConfig.INSTANCE.fullBackground::updateA).build());
 
-        category.addEntry(entryBuilder.startColorField(MutableText.of(ConfigScreen.distanceBackgroundColorOption), SWConfig.INSTANCE.distanceBackground.toSheDanielColor())
+        category.addEntry(entryBuilder.startColorField(MutableComponent.create(ConfigScreen.distanceBackgroundColorOption), SWConfig.INSTANCE.distanceBackground.toSheDanielColor())
             .setDefaultValue(SWConfig.defaultDistanceBackground.toInt() & 0x00FFFFFF)
-            .setTooltip(MutableText.of(ConfigScreen.distanceBackgroundColorTooltip))
+            .setTooltip(MutableComponent.create(ConfigScreen.distanceBackgroundColorTooltip))
             .setSaveConsumer2(SWConfig.INSTANCE.distanceBackground::updateRGB).build());
 
-        category.addEntry(entryBuilder.startIntSlider(MutableText.of(ConfigScreen.distanceBackgroundTransparencyOption), SWConfig.INSTANCE.distanceBackground.a, 0, 255)
+        category.addEntry(entryBuilder.startIntSlider(MutableComponent.create(ConfigScreen.distanceBackgroundTransparencyOption), SWConfig.INSTANCE.distanceBackground.a, 0, 255)
             .setDefaultValue(SWConfig.defaultDistanceBackground.a)
-            .setTooltip(MutableText.of(ConfigScreen.distanceBackgroundTransparencyTooltip))
+            .setTooltip(MutableComponent.create(ConfigScreen.distanceBackgroundTransparencyTooltip))
             .setSaveConsumer(SWConfig.INSTANCE.distanceBackground::updateA).build());
 
-        category.addEntry(entryBuilder.startColorField(MutableText.of(ConfigScreen.textColorOption), SWConfig.INSTANCE.textColor.toSheDanielColor())
+        category.addEntry(entryBuilder.startColorField(MutableComponent.create(ConfigScreen.textColorOption), SWConfig.INSTANCE.textColor.toSheDanielColor())
             .setDefaultValue(SWConfig.defaultTextColor.toInt() & 0x00FFFFFF)
-            .setTooltip(MutableText.of(ConfigScreen.textColorTooltip))
+            .setTooltip(MutableComponent.create(ConfigScreen.textColorTooltip))
             .setSaveConsumer2(SWConfig.INSTANCE.textColor::updateRGB).build());
 
         ConfigCategory keybindingsCategory
-            = builder.getOrCreateCategory(MutableText.of(ConfigScreen.keybindingsCategoryName));
+            = builder.getOrCreateCategory(MutableComponent.create(ConfigScreen.keybindingsCategoryName));
 
         ConfigScreen.addKeybindingEntryToCategory(keybindingsCategory, entryBuilder, Keybindings.openConfigScreenKeyBinding, ConfigScreen.sWMenuBindingName);
         ConfigScreen.addKeybindingEntryToCategory(keybindingsCategory, entryBuilder, Keybindings.toggleWaypointsKeyBinding, ConfigScreen.toggleWaypointsBindingName);
@@ -163,27 +163,27 @@ public class ConfigScreen
     }
 
     private static void addKeybindingEntryToSubCategory(SubCategoryBuilder subCategoryBuilder,
-                                                        ConfigEntryBuilder entryBuilder, KeyBinding keyBinding,
-                                                        TranslatableTextContent translationKey)
+                                                        ConfigEntryBuilder entryBuilder, KeyMapping keyBinding,
+                                                        TranslatableContents translationKey)
     {
         subCategoryBuilder.add(ConfigScreen.getKeybindingOption(entryBuilder, keyBinding, translationKey));
     }
 
     private static void addKeybindingEntryToCategory(ConfigCategory category, ConfigEntryBuilder entryBuilder,
-                                                     KeyBinding keyBinding, TranslatableTextContent translationKey)
+                                                     KeyMapping keyBinding, TranslatableContents translationKey)
     {
         category.addEntry(ConfigScreen.getKeybindingOption(entryBuilder, keyBinding, translationKey));
     }
 
-    private static KeyCodeEntry getKeybindingOption(ConfigEntryBuilder entryBuilder, KeyBinding keyBinding,
-                                                    TranslatableTextContent translationKey)
+    private static KeyCodeEntry getKeybindingOption(ConfigEntryBuilder entryBuilder, KeyMapping keyBinding,
+                                                    TranslatableContents translationKey)
     {
-        return entryBuilder.startKeyCodeField(MutableText.of(translationKey), KeyBindingHelper.getBoundKeyOf(keyBinding))
+        return entryBuilder.startKeyCodeField(MutableComponent.create(translationKey), KeyBindingHelper.getBoundKeyOf(keyBinding))
             .setDefaultValue(keyBinding.getDefaultKey()).setKeySaveConsumer((code) ->
             {
-                keyBinding.setBoundKey(code);
-                KeyBinding.updateKeysByCode();
-                MinecraftClient.getInstance().options.write();
+                keyBinding.setKey(code);
+                KeyMapping.resetMapping();
+                Minecraft.getInstance().options.save();
             }).build();
     }
 
