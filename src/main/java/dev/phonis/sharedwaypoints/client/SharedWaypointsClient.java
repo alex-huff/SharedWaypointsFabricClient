@@ -63,9 +63,7 @@ public class SharedWaypointsClient implements ClientModInitializer
         HudElementRegistry.attachElementBefore(
             VanillaHudElements.CROSSHAIR,
             Identifier.fromNamespaceAndPath(SharedWaypointsClient.MOD_ID, "waypoints"),
-            (drawContext, tickCounter) -> {
-                WaypointRenderer.hudRenderTasks.forEach(consumer -> consumer.accept(drawContext));
-            }
+            (drawContext, tickCounter) -> WaypointRenderer.hudRenderTasks.forEach(consumer -> consumer.accept(drawContext))
         );
     }
 

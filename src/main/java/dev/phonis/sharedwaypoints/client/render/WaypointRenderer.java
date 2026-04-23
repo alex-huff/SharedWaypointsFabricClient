@@ -1,16 +1,19 @@
 package dev.phonis.sharedwaypoints.client.render;
 
-import com.mojang.blaze3d.platform.Window;
 import dev.phonis.sharedwaypoints.client.config.SWConfig;
+import dev.phonis.sharedwaypoints.client.math.Projector;
 import dev.phonis.sharedwaypoints.client.networking.SWDimension;
 import dev.phonis.sharedwaypoints.client.networking.SWWaypoint;
 import dev.phonis.sharedwaypoints.client.state.SWStateManager;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.level.dimension.DimensionType;
+import org.joml.Matrix4f;
+import org.joml.Vector4f;
 
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.IntStream;
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.world.phys.Vec2;
@@ -21,18 +24,25 @@ public class WaypointRenderer
 
     public static boolean coordinateOnScreen(Vec3 position)
     {
-        return position != null && position.z <= 1.0d;
+        return position != null && position.z >= 0;
     }
 
-    public static Vec3 worldSpaceToGUISpace(Vec3 position)
+    public static Vec3 worldSpaceToScreenSpace(Vec3 position, Matrix4f projectionMatrix, Matrix4f positionMatrix, Matrix4f modelViewMatrix, Camera camera)
     {
         Minecraft minecraftClient = Minecraft.getInstance();
-        Window window = minecraftClient.getWindow();
-        Vec3 screenCoords = minecraftClient.gameRenderer.projectPointToScreen(position);
-        double nx = Math.fma(screenCoords.x, 0.5d, 0.5d) * window.getGuiScaledWidth();
-        double ny = window.getGuiScaledHeight() - Math.fma(screenCoords.y, 0.5d, 0.5d) * window.getGuiScaledHeight();
-        double nz = screenCoords.z;
-        return new Vec3(nx, ny, nz);
+        double dx = position.x - camera.position().x;
+        double dy = position.y - camera.position().y;
+        double dz = position.z - camera.position().z;
+        Vector4f cameraDirection = new Vector4f((float) dx, (float) dy, (float) dz, 1F);
+        cameraDirection.mul(positionMatrix);
+        int[] viewport = new int[]{ 0, 0, minecraftClient.getWindow().getWidth(), minecraftClient.getWindow().getHeight() };
+        projectionMatrix = new Matrix4f(projectionMatrix);
+        projectionMatrix.mul(modelViewMatrix);
+        Vec3 screenCoords
+            = ((Projector) projectionMatrix).projectNonClampZ(cameraDirection.x(), cameraDirection.y(), cameraDirection.z(), viewport);
+        int displayHeight = minecraftClient.getWindow().getHeight();
+        double scaleFactor = minecraftClient.getWindow().getGuiScale();
+        return new Vec3(screenCoords.x / scaleFactor, (displayHeight - screenCoords.y) / scaleFactor, screenCoords.z);
     }
 
     private record RenderContext3D(Vec3 realLocation, Vec3 screenCoordinates, SWWaypoint waypoint)
@@ -55,7 +65,7 @@ public class WaypointRenderer
                  currentDimension.equals(DimensionType.Skybox.NONE)));
     }
 
-    public static void renderWaypoints(DimensionType.Skybox currentDimension)
+    public static void renderWaypoints(DimensionType.Skybox currentDimension, Matrix4f projectionMatrix, Matrix4f positionMatrix, Matrix4f modelViewMatrix, Camera camera)
     {
         Minecraft minecraftClient = Minecraft.getInstance();
         int screenWidth = minecraftClient.getWindow().getGuiScaledWidth();
@@ -72,7 +82,7 @@ public class WaypointRenderer
                     adjusted ? 128d : swWaypoint.location.y,
                     adjusted ? swWaypoint.location.z / 8d : swWaypoint.location.z);
                 Vec3 pixelCoordinates
-                    = WaypointRenderer.worldSpaceToGUISpace(new Vec3(adjustedLocation.x, adjustedLocation.y, adjustedLocation.z));
+                    = WaypointRenderer.worldSpaceToScreenSpace(new Vec3(adjustedLocation.x, adjustedLocation.y, adjustedLocation.z), projectionMatrix, positionMatrix, modelViewMatrix, camera);
                 return new WaypointRenderer.RenderContext3D(adjustedLocation, pixelCoordinates, swWaypoint);
             }).filter(renderContext3D -> WaypointRenderer.coordinateOnScreen(renderContext3D.screenCoordinates))
             .map(renderContext3D ->
