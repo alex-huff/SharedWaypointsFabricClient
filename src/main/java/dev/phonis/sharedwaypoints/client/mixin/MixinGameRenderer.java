@@ -32,7 +32,7 @@ public class MixinGameRenderer
         CameraRenderState cameraRendererState = Minecraft.getInstance().gameRenderer.gameRenderState().levelRenderState.cameraRenderState;
         Matrix4f projectionMatrix = matrix4f;
         Matrix4f positionMatrix = cameraRendererState.viewRotationMatrix;
-        Matrix4f modelViewMatrix = RenderSystem.getModelViewMatrixCopy();
+        Matrix4f modelViewMatrix = RenderSystem.getModelViewStack();
 
         // Clear any hudRenderTasks from last tick.
         WaypointRenderer.hudRenderTasks.clear();
