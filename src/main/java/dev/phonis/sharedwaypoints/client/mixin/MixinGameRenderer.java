@@ -24,20 +24,20 @@ public class MixinGameRenderer
         method = "renderLevel(Lnet/minecraft/client/DeltaTracker;)V",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/client/renderer/LevelRenderer;renderLevel(Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/renderer/state/level/CameraRenderState;Lorg/joml/Matrix4fc;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;ZLnet/minecraft/client/renderer/chunk/ChunkSectionsToRender;)V", shift = At.Shift.BEFORE
+            target = "Lnet/minecraft/client/renderer/LevelRenderer;render(Lcom/mojang/blaze3d/resource/GraphicsResourceAllocator;Lnet/minecraft/client/DeltaTracker;ZLnet/minecraft/client/renderer/state/level/CameraRenderState;Lorg/joml/Matrix4fc;Lcom/mojang/blaze3d/buffers/GpuBufferSlice;Lorg/joml/Vector4f;Z)V", shift = At.Shift.BEFORE
         )
     )
     public void onWorldRender(DeltaTracker renderTickCounter, CallbackInfo ci, @Local(ordinal = 0) Matrix4f matrix4f)
     {
-        CameraRenderState cameraRendererState = Minecraft.getInstance().gameRenderer.getGameRenderState().levelRenderState.cameraRenderState;
+        CameraRenderState cameraRendererState = Minecraft.getInstance().gameRenderer.gameRenderState().levelRenderState.cameraRenderState;
         Matrix4f projectionMatrix = matrix4f;
         Matrix4f positionMatrix = cameraRendererState.viewRotationMatrix;
-        Matrix4f modelViewMatrix = RenderSystem.getModelViewMatrix();
+        Matrix4f modelViewMatrix = RenderSystem.getModelViewMatrixCopy();
 
         // Clear any hudRenderTasks from last tick.
         WaypointRenderer.hudRenderTasks.clear();
         Minecraft minecraftClient = Minecraft.getInstance();
-        Camera camera = minecraftClient.gameRenderer.getMainCamera();
+        Camera camera = minecraftClient.gameRenderer.mainCamera();
 
         if (minecraftClient.level == null)
         {

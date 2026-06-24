@@ -31,7 +31,7 @@ public class Keybindings
 
         while (Keybindings.openConfigScreenKeyBinding.consumeClick())
         {
-            client.setScreen(ConfigScreen.getConfigScreen(client.screen));
+            client.gui.setScreen(ConfigScreen.getConfigScreen(client.gui.screen()));
         }
 
         while (Keybindings.toggleWaypointsKeyBinding.consumeClick())

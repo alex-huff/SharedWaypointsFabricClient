@@ -90,7 +90,7 @@ public class WaypointRenderer
                 Vec2 pixelCoordinates
                     = new Vec2((float) renderContext3D.screenCoordinates().x, (float) renderContext3D.screenCoordinates().y);
                 int distance = (int) renderContext3D.realLocation()
-                    .distanceTo(minecraftClient.gameRenderer.getMainCamera().position());
+                    .distanceTo(minecraftClient.gameRenderer.mainCamera().position());
                 return new WaypointRenderer.RenderContext2D(distance, pixelCoordinates, renderContext3D.waypoint());
             }).forEach(toRender::add));
         if (toRender.isEmpty())
