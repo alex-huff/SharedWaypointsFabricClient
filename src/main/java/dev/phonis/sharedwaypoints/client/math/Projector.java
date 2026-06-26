@@ -1,10 +1,10 @@
 package dev.phonis.sharedwaypoints.client.math;
 
-import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
 
 public interface Projector
 {
 
-    Vec3 projectNonClampZ(float x, float y, float z, int[] viewport);
+    Vector3f projectNoZDivide(float x, float y, float z, int[] viewport, Vector3f winCoordsDest);
 
 }

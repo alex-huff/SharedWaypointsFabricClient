@@ -1,10 +1,12 @@
 package dev.phonis.sharedwaypoints.client.mixin;
 
 import dev.phonis.sharedwaypoints.client.math.Projector;
-import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+
+import static org.joml.Math.fma;
 
 @Mixin(Matrix4f.class)
 public abstract class MixinMatrix4f implements Projector
@@ -44,13 +46,16 @@ public abstract class MixinMatrix4f implements Projector
     float m33;
 
     @Override
-    public Vec3 projectNonClampZ(float x, float y, float z, int[] viewport)
+    public Vector3f projectNoZDivide(float x, float y, float z, int[] viewport, Vector3f winCoordsDest)
     {
-        float inverseW = 1F / Math.fma(this.m03, x, Math.fma(this.m13, y, Math.fma(this.m23, z, this.m33)));
-        float nx = Math.fma(this.m00, x, Math.fma(this.m10, y, Math.fma(this.m20, z, this.m30))) * inverseW;
-        float ny = Math.fma(this.m01, x, Math.fma(this.m11, y, Math.fma(this.m21, z, this.m31))) * inverseW;
-        float nz = Math.fma(this.m02, x, Math.fma(this.m12, y, Math.fma(this.m22, z, this.m32)));
-        return new Vec3(Math.fma(Math.fma(nx, 0.5F, 0.5F), viewport[2], viewport[0]), Math.fma(Math.fma(ny, 0.5F, 0.5F), viewport[3], viewport[1]), nz);
+        float invW = 1.0f / fma(this.m03, x, fma(this.m13, y, fma(this.m23, z, this.m33)));
+        float nx = fma(this.m00, x, fma(this.m10, y, fma(this.m20, z, this.m30))) * invW;
+        float ny = fma(this.m01, x, fma(this.m11, y, fma(this.m21, z, this.m31))) * invW;
+        float nz = fma(this.m02, x, fma(this.m12, y, fma(this.m22, z, this.m32)));
+        winCoordsDest.x = fma(fma(nx, 0.5f, 0.5f), viewport[2], viewport[0]);
+        winCoordsDest.y = fma(fma(ny, 0.5f, 0.5f), viewport[3], viewport[1]);
+        winCoordsDest.z = nz;
+        return winCoordsDest;
     }
 
 }

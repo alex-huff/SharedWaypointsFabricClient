@@ -8,6 +8,7 @@ import dev.phonis.sharedwaypoints.client.state.SWStateManager;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.level.dimension.DimensionType;
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import java.util.*;
@@ -24,7 +25,8 @@ public class WaypointRenderer
 
     public static boolean coordinateOnScreen(Vec3 position)
     {
-        return position != null && position.z >= 0;
+        // less than or equal to near plane
+        return position != null && position.z <= .05f;
     }
 
     public static Vec3 worldSpaceToScreenSpace(Vec3 position, Matrix4f projectionMatrix, Matrix4f positionMatrix, Matrix4f modelViewMatrix, Camera camera)
@@ -38,8 +40,7 @@ public class WaypointRenderer
         int[] viewport = new int[]{ 0, 0, minecraftClient.getWindow().getWidth(), minecraftClient.getWindow().getHeight() };
         projectionMatrix = new Matrix4f(projectionMatrix);
         projectionMatrix.mul(modelViewMatrix);
-        Vec3 screenCoords
-            = ((Projector) projectionMatrix).projectNonClampZ(cameraDirection.x(), cameraDirection.y(), cameraDirection.z(), viewport);
+        Vector3f screenCoords = ((Projector) projectionMatrix).projectNoZDivide(cameraDirection.x(), cameraDirection.y(), cameraDirection.z(), viewport, new Vector3f());
         int displayHeight = minecraftClient.getWindow().getHeight();
         double scaleFactor = minecraftClient.getWindow().getGuiScale();
         return new Vec3(screenCoords.x / scaleFactor, (displayHeight - screenCoords.y) / scaleFactor, screenCoords.z);
